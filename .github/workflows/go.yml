@@ -9,6 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       QT_PKG_CONFIG: "true"
+      QT_VERSION: "5.12.8"
     steps:
       - name: Install Go
         uses: actions/setup-go@v1
@@ -25,11 +26,14 @@ jobs:
           sudo apt-get --no-install-recommends install libqt*5-dev qt*5-dev qt*5-doc-html qml-module-qtquick*
           sudo apt-get install qml-module-qtmultimedia qml-module-qt-labs-folderlistmodel qml-module-qt-labs-settings
 
-      - name: Install Qt bindings
-        run: go install -v -tags=no_env github.com/therecipe/qt/cmd/...
-
       - name: Vendor Go modules
         run: go mod vendor
+
+      - name: Install Qt commands
+        run: go install -v -tags=no_env github.com/therecipe/qt/cmd/...
+
+      - name: Install Qt bindings
+        run: $(go env GOPATH)/bin/qtsetup
 
       - name: Build
         run: $(go env GOPATH)/bin/qtdeploy build desktop .
