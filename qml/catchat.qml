@@ -249,6 +249,8 @@ ApplicationWindow {
         anchors.fill: parent
 
         ContactList {
+            id: contactList
+
             Layout.minimumWidth: mainWindow.width * 0.3
             Layout.preferredWidth: mainWindow.width * 0.3
             Layout.maximumWidth: mainWindow.width * 0.3
@@ -278,7 +280,9 @@ ApplicationWindow {
             }
 
             Item {
-                ConversationView {}
+                ConversationView {
+                    id: conversationView
+                }
             }
         }
     }
