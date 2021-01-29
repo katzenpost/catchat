@@ -1,4 +1,4 @@
-import QtQuick 2.4
+import QtQuick 2.6
 import QtQuick.Controls 2.2
 import QtQuick.Controls.Material 2.1
 import QtQuick.Layouts 1.3
@@ -41,21 +41,28 @@ ApplicationWindow {
     }
 
     Item {
-/*
         AboutDialog {
             id: aboutDialog
-            x: (mainWindow.width - width) / 2
-            y: mainWindow.height / 6
-            width: Math.min(mainWindow.width, mainWindow.height) / 3 * 2
+            x: mainWindow.width / 2 - width / 2
+            y: mainWindow.height / 2 - height / 2 - mainWindow.header.height
+            width: 340
+            height: 340
         }
-*/
 
         AddContactDialog {
             id: addContactDialog
+            enabled: accountBridge.status == "Connected"
             x: mainWindow.width / 2 - width / 2
             y: mainWindow.height / 2 - height / 2 - mainWindow.header.height
             width: 340
             height: 500
+        }
+
+        SettingsDialog {
+            id: settingsDialog
+            x: (mainWindow.width - width) / 2
+            y: mainWindow.height / 6
+            width: Math.min(mainWindow.width, mainWindow.height) / 3 * 2
         }
 
         Popup {
@@ -97,6 +104,36 @@ ApplicationWindow {
                         errorDialog.close()
                     }
                 }
+            }
+        }
+    }
+
+    Item {
+        Shortcut {
+            sequence: "Ctrl+Q"
+            onActivated: {
+                Qt.quit()
+            }
+        }
+        Shortcut {
+            sequence: "Ctrl+N"
+            onActivated: {
+                if (accountBridge.status == "Connected") {
+                    addContactDialog.reset()
+                    addContactDialog.open()
+                }
+            }
+        }
+        Shortcut {
+            sequence: "Ctrl+,"
+            onActivated: {
+                settingsDialog.open()
+            }
+        }
+        Shortcut {
+            sequence: "Ctrl+K"
+            onActivated: {
+                contactList.forceActiveFocus()
             }
         }
     }
@@ -168,6 +205,7 @@ ApplicationWindow {
                 x: parent.width - width
                 transformOrigin: Menu.TopRight
 
+/*
                 MenuItem {
                     text: qsTr("Connect")
                     onTriggered: function() {
@@ -175,12 +213,11 @@ ApplicationWindow {
                         connectDialog.open()
                     }
                 }
-                /*
+*/
                 MenuItem {
                     text: qsTr("Settings")
                     onTriggered: settingsDialog.open()
                 }
-                */
                 MenuItem {
                     text: qsTr("About")
                     onTriggered: aboutDialog.open()
@@ -199,6 +236,7 @@ ApplicationWindow {
             id: drawerLayout
             anchors.fill: parent
 
+/*
             Label {
                 text: accountBridge.nickname
             }
@@ -206,6 +244,7 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 orientation: Qt.Horizontal
             }
+*/
 
             ListView {
                 id: listView
@@ -216,13 +255,16 @@ ApplicationWindow {
                     width: parent.width
                     text: model.title
                     highlighted: ListView.isCurrentItem
+                    enabled: (model.sid != 0) || (accountBridge.status == "Connected")
                     onClicked: {
                         listView.currentIndex = -1
                         drawer.close()
                         switch (model.sid) {
                         case 0:
-                            addContactDialog.reset()
-                            addContactDialog.open()
+                            if (accountBridge.status == "Connected") {
+                                addContactDialog.reset()
+                                addContactDialog.open()
+                            }
                             break
                         case 1:
                             Qt.quit()
@@ -249,6 +291,8 @@ ApplicationWindow {
         anchors.fill: parent
 
         ContactList {
+            id: contactList
+
             Layout.minimumWidth: mainWindow.width * 0.3
             Layout.preferredWidth: mainWindow.width * 0.3
             Layout.maximumWidth: mainWindow.width * 0.3
@@ -278,7 +322,9 @@ ApplicationWindow {
             }
 
             Item {
-                ConversationView {}
+                ConversationView {
+                    id: conversationView
+                }
             }
         }
     }

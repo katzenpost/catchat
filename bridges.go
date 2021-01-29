@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/therecipe/qt/core"
 )
 
@@ -18,6 +20,7 @@ type AccountBridge struct {
 	_ func(passphrase string, nickname string) bool `slot:"addContact"`
 	_ func(contact string)                          `slot:"loadConversation"`
 	_ func(recipient string, message string)        `slot:"sendMessage"`
+	_ func(contact string, url string)              `slot:"loadAvatar"`
 
 	_ *core.QAbstractListModel `property:"contactListModel"`
 	_ *core.QAbstractListModel `property:"conversationModel"`
@@ -32,6 +35,7 @@ type ConfigBridge struct {
 	_ string `property:"redirectURL"`
 	_ string `property:"theme"`
 	_ string `property:"style"`
+	_ string `property:"notification"`
 	_ int    `property:"positionX"`
 	_ int    `property:"positionY"`
 	_ int    `property:"width"`
@@ -58,5 +62,9 @@ func setupQmlBridges() {
 	})
 	accountBridge.ConnectSendMessage(func(recipient string, message string) {
 		sendMessage(catShadowClient, recipient, message)
+	})
+	accountBridge.ConnectLoadAvatar(func(nickname string, iu string) {
+		fmt.Println("Loading avatar:", iu)
+		contactListModel.updateAvatar("test", iu)
 	})
 }

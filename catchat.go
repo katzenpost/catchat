@@ -158,6 +158,11 @@ func main() {
 		panic(err)
 	}
 	os.MkdirAll(configDir, 0700)
+	dataDir, err := scope.DataDirs()
+	if err != nil {
+		panic(err)
+	}
+	os.MkdirAll(dataDir[0], 0700)
 	configFile, err := scope.ConfigPath("catchat.conf")
 	if err != nil {
 		panic(err)
@@ -190,6 +195,7 @@ func main() {
 
 	configBridge.SetTheme(config.Theme)
 	configBridge.SetStyle(config.Style)
+	configBridge.SetNotification(config.Notification)
 	configBridge.SetFirstRun(config.FirstRun)
 	configBridge.SetPositionX(config.PositionX)
 	configBridge.SetPositionY(config.PositionY)
@@ -207,6 +213,7 @@ func main() {
 	// Save Qt user interface config on clean shutdown.
 	config.Theme = configBridge.Theme()
 	config.Style = configBridge.Style()
+	config.Notification = configBridge.Notification()
 	config.PositionX = configBridge.PositionX()
 	config.PositionY = configBridge.PositionY()
 	config.Width = configBridge.Width()
