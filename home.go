@@ -24,8 +24,8 @@ var (
 )
 
 type HomePage struct {
-    addContact    *widget.Clickable
-    showSettings  *widget.Clickable
+	addContact    *widget.Clickable
+	showSettings  *widget.Clickable
 	av            map[string]*widget.Image
 	contactClicks map[string]*Click
 }
@@ -43,18 +43,18 @@ func (p *HomePage) Layout(gtx layout.Context) layout.Dimensions {
 	return bg.Layout(gtx, func(gtx C) D {
 		// returns a flex consisting of the contacts list and add contact button
 		return layout.Flex{Axis: layout.Vertical, Alignment: layout.End}.Layout(gtx,
-            // topbar: Name, Add Contact, Settings
+			// topbar: Name, Add Contact, Settings
 			layout.Rigid(func(gtx C) D {
 				return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceBetween, Alignment: layout.Baseline}.Layout(
-                    gtx,
-                    layout.Rigid(material.H6(th, "Catchat").Layout),
+					gtx,
+					layout.Rigid(material.H6(th, "Catchat").Layout),
 					layout.Flexed(1, fill{th.Bg}.Layout),
-				    layout.Rigid(material.Button(th, p.addContact, "Add Contact").Layout),
-				    layout.Rigid(material.Button(th, p.showSettings, "Settings").Layout),
+					layout.Rigid(material.Button(th, p.addContact, "Add Contact").Layout),
+					layout.Rigid(material.Button(th, p.showSettings, "Settings").Layout),
 				)
-            }),
+			}),
 
-            // show list of conversations
+			// show list of conversations
 			layout.Flexed(1, func(gtx C) D {
 				gtx.Constraints.Min.X = gtx.Px(unit.Dp(300))
 				// the contactList
@@ -188,9 +188,9 @@ func (p *HomePage) Event(gtx layout.Context) interface{} {
 	if p.addContact.Clicked() {
 		return AddContactClick{}
 	}
-    if p.showSettings.Clicked() {
-        return ShowSettingsClick{}
-    }
+	if p.showSettings.Clicked() {
+		return ShowSettingsClick{}
+	}
 	for nickname, click := range p.contactClicks {
 		for _, e := range click.Events(gtx.Queue) {
 			if e.Type == TypeClick {
@@ -219,7 +219,7 @@ func newHomePage() *HomePage {
 	return &HomePage{
 		addContact:    &widget.Clickable{},
 		showSettings:  &widget.Clickable{},
-        contactClicks: make(map[string]*Click),
+		contactClicks: make(map[string]*Click),
 		av:            make(map[string]*widget.Image),
 	}
 }
