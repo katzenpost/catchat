@@ -47,7 +47,7 @@ func (p *HomePage) Layout(gtx layout.Context) layout.Dimensions {
 			layout.Rigid(func(gtx C) D {
 				return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceBetween, Alignment: layout.Baseline}.Layout(
 					gtx,
-					layout.Rigid(material.H6(th, "Catchat").Layout),
+					layout.Rigid(material.H6(th, "Home").Layout),
 					layout.Flexed(1, fill{th.Bg}.Layout),
 					layout.Rigid(material.Button(th, p.addContact, "Add Contact").Layout),
 					layout.Rigid(material.Button(th, p.showSettings, "Settings").Layout),
