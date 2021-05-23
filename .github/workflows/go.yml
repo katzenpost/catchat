@@ -41,7 +41,7 @@ jobs:
 
       - name: Build android_build docker image
         run: |
-          docker build --no-cache -t katzenpost/android_build -f Dockerfile.android
+          docker build --no-cache -t katzenpost/android_build -f Dockerfile.android .
 
       - name: Build catchat apk
         run: |
