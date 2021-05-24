@@ -29,10 +29,10 @@ jobs:
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            tag_name: ${{ github.ref }}
-            release_name: Testing ${{ github.ref }}
-            prerelease: true
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Testing ${{ github.ref }}
+          prerelease: true
 
       - name: Upload catchat x86_64
         id: upload-release-asset
