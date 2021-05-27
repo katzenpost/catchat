@@ -1,63 +1,22 @@
 name: build
 on: [push, pull_request]
 jobs:
-  build_and_release:
+  build_ios:
     strategy:
       matrix:
         go-version: [1.15.x]
-        os: [ubuntu-latest]
+        os: [macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go-version }}
-
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Install Build dependencies
+      - name: Install gogio
         run: |
-          sudo apt-get update
-          sudo apt-get --no-install-recommends install build-essential libgles2 libgles2-mesa-dev libglib2.0-dev libxkbcommon-dev libxkbcommon-x11-dev libglu1-mesa-dev libxcursor-dev libwayland-dev libx11-xcb-dev
-
-      - name: Build
-        run: go build
-
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Testing ${{ github.ref }}
-          prerelease: true
-
-      - name: Upload catchat x86_64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./catchat
-          asset_name: catchat-linux
-          asset_content_type: application/binary
-
-      - name: Build android_build docker image
+          go install -v gioui.org/cmd/gogio
+      - name: Build app
         run: |
-          docker build --no-cache -t katzenpost/android_build -f Dockerfile.android .
-
-      - name: Build catchat apk
-        run: |
-          docker run -v "$(pwd)":/go/build/ katzenpost/android_build gogio -arch arm64,amd64 -x -target android -appid org.mixnetworks.catchat -version 1 .
-
-      - name: Upload catchat android apk
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./catchat.apk
-          asset_name: catchat.apk
-          asset_content_type: application/binary
+          gogio -x -target ios -appid org.mixnetworks.catchat -version 1 .
