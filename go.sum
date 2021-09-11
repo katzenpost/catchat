@@ -225,6 +225,8 @@ github.com/katzenpost/doubleratchet v0.0.13 h1:XKm142nPgp9o7QGbJHs8o6udDSAQaaZ1B
 github.com/katzenpost/doubleratchet v0.0.13/go.mod h1:1btKAEHf4Af7xY/SCooy5xMKE8hYWxtfaAdvzMqwGz0=
 github.com/katzenpost/katzenpost v0.0.2-0.20210911133021-185ce111ef49 h1:10Dlto9UINEbox7DbVtFJucMGEm3tBaAIDPrfsnzBAU=
 github.com/katzenpost/katzenpost v0.0.2-0.20210911133021-185ce111ef49/go.mod h1:Lclh/AMWqnI+0i3ljlalw2yP4SsFnKfqpmr1eKbj/c0=
+github.com/katzenpost/katzenpost v0.0.2 h1:ZZlf0qQqiKbdkMfLwnm/JUbsd23UA3zbb2Wa3tmOarU=
+github.com/katzenpost/katzenpost v0.0.2/go.mod h1:Lclh/AMWqnI+0i3ljlalw2yP4SsFnKfqpmr1eKbj/c0=
 github.com/katzenpost/noise v0.0.3 h1:bpYnozkk8j0XE1FAX9iRYgKtfIywuAINF+vMdBOidrM=
 github.com/katzenpost/noise v0.0.3/go.mod h1:+3UhOI7g4gXPlAdRKdgMKmxZmK/PP1/3sCnX20SA/vQ=
 github.com/kisielk/errcheck v1.1.0/go.mod h1:EZBBE59ingxPouuu3KfxchcWSUPOHkagtvWXihfKN4Q=
