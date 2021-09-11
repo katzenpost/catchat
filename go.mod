@@ -13,5 +13,3 @@ require (
 	golang.org/x/exp v0.0.0-20210722180016-6781d3edade3
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
 )
-
-replace github.com/katzenpost/katzenpost => ../katzenpost
