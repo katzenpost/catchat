@@ -18,7 +18,7 @@ docker-go-mod: docker-debian-base
 
 docker-go-mod-update: docker-go-mod
 	docker run -v $(shell readlink -f ../katzenpost):/go/katzenpost -v $(shell readlink -f .):/go/catchat --name catchat_go_mod -it catchat/go_mod \
-			bash -c 'cd /go/catchat; go mod tidy; go mod download' \
+			bash -c 'cd /go/catchat; go mod tidy' \
 		&& docker commit catchat_go_mod catchat/go_mod \
 		&& docker rm catchat_go_mod
 
