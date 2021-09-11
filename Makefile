@@ -22,6 +22,12 @@ docker-go-mod-update: docker-go-mod
 		&& docker commit catchat_go_mod catchat/go_mod \
 		&& docker rm catchat_go_mod
 
+docker-go-mod-upgrade: docker-go-mod
+	docker run -v $(shell readlink -f ../katzenpost):/go/katzenpost -v $(shell readlink -f .):/go/catchat --name catchat_go_mod -it catchat/go_mod \
+			bash -c 'cd /go/catchat; go get -d -u' \
+		&& docker commit catchat_go_mod catchat/go_mod \
+		&& docker rm catchat_go_mod
+
 docker-shell: docker-debian-base
 	docker run -v $(shell readlink -f ../katzenpost):/go/katzenpost -v $(shell readlink -f .):/go/catchat --rm -it catchat/debian_base bash
 
