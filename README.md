@@ -9,8 +9,6 @@ A chat client using catshadow.
 
 ## Getting the source code
 
-This is the `wip_gioui_interface` branch of catchat, which currently lives on github.com.
-
     git clone https://github.com/katzenpost/catchat
     cd catchat
     git checkout wip_gioui_interface
