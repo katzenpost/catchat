@@ -1,6 +1,6 @@
 module github.com/katzenpost/catchat
 
-go 1.13
+go 1.16
 
 require (
 	gioui.org v0.0.0-20210830132844-12aa9defe700
