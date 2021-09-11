@@ -51,8 +51,9 @@ See the [install instructions](http://golang.org/doc/install.html).
 
 Clone the repo as above, and then:
 
-    docker build --no-cache -t katzenpost/build -f Dockerfile .
-    docker run --rm -v "$(pwd)":/go/catchat/ katzenpost/build go build
+    make docker-build-linux
+
+If your user is not in the `docker` group, it is necessary to prefix `make` with `sudo`.
 
 #### Building for android
 
