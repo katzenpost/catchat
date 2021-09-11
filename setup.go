@@ -73,7 +73,7 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 	var catshadowClient *catshadow.Client
 	// automatically create a statefile if one does not already exist
 	if _, err := os.Stat(statefile); os.IsNotExist(err) {
-		cfg, linkKey, err := client.AutoRegisterRandomClient(cfg)
+		cfg, linkKey, err := client.NewEphemeralClient(cfg)
 		if err != nil {
 			result <- err
 			return
@@ -116,7 +116,7 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 
 		if *registerNew {
 			// create a new linkKey
-			cfg, linkKey, err := client.AutoRegisterRandomClient(cfg)
+			cfg, linkKey, err := client.NewEphemeralClient(cfg)
 			if err != nil {
 				result <- err
 				return
