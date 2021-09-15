@@ -41,7 +41,7 @@ var (
 
 	minPasswordLen = 5 // XXX pick something reasonable
 
-	notifications = make(map[string]*notify.Notification)
+	notifications = make(map[string]notify.Notification)
 
 	// theme
 	th = func() *material.Theme {
@@ -59,7 +59,6 @@ var (
 type App struct {
 	w     *app.Window
 	ops   *op.Ops
-	no    *notify.Manager
 	c     *catshadow.Client
 	stack pageStack
 	focus bool
@@ -71,11 +70,6 @@ func newApp(w *app.Window) *App {
 		w:   w,
 		ops: &op.Ops{},
 	}
-	no, err := notify.NewManager()
-	if err != nil {
-		return nil
-	}
-	a.no = &no
 	return a
 }
 
@@ -318,14 +312,14 @@ func (a *App) handleCatshadowEvent(e interface{}) error {
 	case *client.ConnectionStatusEvent:
 		if event.IsConnected {
 			go func() {
-				if n, err := a.no.CreateNotification("Connected", "Catchat has connected"); err == nil {
+				if n, err := notify.Push("Connected", "Catchat has connected"); err == nil {
 					<-time.After(notificationTimeout)
 					n.Cancel()
 				}
 			}()
 		} else {
 			go func() {
-				if n, err := a.no.CreateNotification("Disconnected", "Catchat has disconnected"); err == nil {
+				if n, err := notify.Push("Disconnected", "Catchat has disconnected"); err == nil {
 					<-time.After(notificationTimeout)
 					n.Cancel()
 				}
@@ -333,7 +327,7 @@ func (a *App) handleCatshadowEvent(e interface{}) error {
 		}
 		if event.Err != nil {
 			go func() {
-				if n, err := a.no.CreateNotification("Error", fmt.Sprintf("Catchat error: %s", event.Err)); err == nil {
+				if n, err := notify.Push("Error", fmt.Sprintf("Catchat error: %s", event.Err)); err == nil {
 					<-time.After(notificationTimeout)
 					n.Cancel()
 				}
@@ -341,16 +335,16 @@ func (a *App) handleCatshadowEvent(e interface{}) error {
 		}
 	case *catshadow.KeyExchangeCompletedEvent:
 		if event.Err != nil {
-			if n, err := a.no.CreateNotification("Key Exchange", fmt.Sprintf("Failed: %s", event.Err)); err == nil {
+			if n, err := notify.Push("Key Exchange", fmt.Sprintf("Failed: %s", event.Err)); err == nil {
 				go func() { <-time.After(notificationTimeout); n.Cancel() }()
 			}
 		} else {
-			if n, err := a.no.CreateNotification("Key Exchange", fmt.Sprintf("Completed: %s", event.Nickname)); err == nil {
+			if n, err := notify.Push("Key Exchange", fmt.Sprintf("Completed: %s", event.Nickname)); err == nil {
 				go func() { <-time.After(notificationTimeout); n.Cancel() }()
 			}
 		}
 	case *catshadow.MessageNotSentEvent:
-		if n, err := a.no.CreateNotification("Message Not Sent", fmt.Sprintf("Failed to send message to %s", event.Nickname)); err == nil {
+		if n, err := notify.Push("Message Not Sent", fmt.Sprintf("Failed to send message to %s", event.Nickname)); err == nil {
 			go func() { <-time.After(notificationTimeout); n.Cancel() }()
 		}
 	case *catshadow.MessageReceivedEvent:
@@ -366,7 +360,7 @@ func (a *App) handleCatshadowEvent(e interface{}) error {
 			}
 		}
 		// emit a notification in all other cases
-		if n, err := a.no.CreateNotification("Message Received", fmt.Sprintf("Message Received from %s", event.Nickname)); err == nil {
+		if n, err := notify.Push("Message Received", fmt.Sprintf("Message Received from %s", event.Nickname)); err == nil {
 			if o, ok := notifications[event.Nickname]; ok {
 				// cancel old notification before replacing with a new one
 				o.Cancel()

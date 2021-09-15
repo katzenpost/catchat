@@ -3,13 +3,16 @@ module github.com/katzenpost/catchat
 go 1.16
 
 require (
-	gioui.org v0.0.0-20210830132844-12aa9defe700
+	gioui.org v0.0.0-20210914072453-5050060e87c3
 	gioui.org/x v0.0.0-20210816192830-9ea938c228a0
-	gioui.org/x/notify v0.0.0-20210602142902-98819c83723b
+	gioui.org/x/notify v0.0.0-20210816192830-9ea938c228a0
 	github.com/benc-uk/gofract v0.0.0-20200624074122-f2d59d20813c
+	github.com/esiqveland/notify v0.11.0 // indirect
+	github.com/godbus/dbus/v5 v5.0.5 // indirect
 	github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd
 	github.com/katzenpost/katzenpost v0.0.2
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	golang.org/x/exp v0.0.0-20210722180016-6781d3edade3
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d
+	golang.org/x/sys v0.0.0-20210915083310-ed5796bab164 // indirect
 )
