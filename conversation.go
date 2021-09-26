@@ -68,6 +68,7 @@ func (c *conversationPage) Event(gtx layout.Context) interface{} {
 		switch ev.Type {
 		case LongPressed:
 			clipboard.ReadOp{Tag: c}.Add(gtx.Ops)
+			return RedrawEvent{}
 		default:
 			// return focus to the editor
 			c.compose.Focus()

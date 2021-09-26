@@ -81,6 +81,7 @@ func (b *Background) Layout(gtx layout.Context, w layout.Widget) layout.Dimensio
 	return dims
 }
 
+type RedrawEvent struct{}
 type BackEvent struct{}
 
 type fill struct {

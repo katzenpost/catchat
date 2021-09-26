@@ -82,6 +82,8 @@ func (a *App) update(gtx layout.Context) {
 	page := a.stack.Current()
 	if e := page.Event(gtx); e != nil {
 		switch e := e.(type) {
+		case RedrawEvent:
+			a.w.Invalidate()
 		case BackEvent:
 			a.stack.Pop()
 		case signInStarted:
