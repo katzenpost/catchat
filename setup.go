@@ -9,7 +9,6 @@ import (
 	"github.com/katzenpost/katzenpost/catshadow"
 	catconfig "github.com/katzenpost/katzenpost/catshadow/config"
 	"github.com/katzenpost/katzenpost/client"
-	clientConfig "github.com/katzenpost/katzenpost/client/config"
 	"path/filepath"
 )
 
@@ -71,20 +70,20 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 	}
 
 	var catshadowClient *catshadow.Client
+	cfg, linkKey, err := client.NewEphemeralClient(cfg)
+	if err != nil {
+		result <- err
+		return
+	}
+
+	c, err := client.New(cfg)
+	if err != nil {
+		result <- err
+		return
+	}
+
 	// automatically create a statefile if one does not already exist
 	if _, err := os.Stat(statefile); os.IsNotExist(err) {
-		cfg, linkKey, err := client.NewEphemeralClient(cfg)
-		if err != nil {
-			result <- err
-			return
-		}
-
-		c, err := client.New(cfg)
-		if err != nil {
-			result <- err
-			return
-		}
-
 		// Create statefile.
 		stateWorker, err = catshadow.NewStateWriter(c.GetLogger("catshadow_state"), statefile, passphrase)
 		if err != nil {
@@ -95,7 +94,7 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 		// Start the stateworker
 		stateWorker.Start()
 
-		// create ephemeral spool
+		// create a catshadow client and message spool
 		fmt.Println("creating remote message receiver spool")
 		user := fmt.Sprintf("%x", linkKey.PublicKey().Bytes())
 		catshadowClient, err = catshadow.NewClientAndRemoteSpool(backendLog, c, stateWorker, user, linkKey)
@@ -112,26 +111,6 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 		if err != nil {
 			result <- err
 			return
-		}
-
-		if *registerNew {
-			// create a new linkKey
-			cfg, linkKey, err := client.NewEphemeralClient(cfg)
-			if err != nil {
-				result <- err
-				return
-			}
-
-			// update the saved state with the new linkKey and provider
-			state.LinkKey = linkKey
-			state.User = cfg.Account.User
-			state.Provider = cfg.Account.Provider
-		}
-
-		// configure Account from the statefile
-		cfg.Account = &clientConfig.Account{
-			User:     state.User,
-			Provider: state.Provider,
 		}
 
 		// Start the stateworker
