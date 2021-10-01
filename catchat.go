@@ -92,6 +92,7 @@ func (a *App) update(gtx layout.Context) {
 			a.stack.Clear(newSignInPage(a))
 		case connectSuccess:
 			a.c = e.client
+			a.c.Start()
 			a.stack.Clear(newHomePage(a))
 		case ShowSettingsClick:
 			a.stack.Push(newSettingsPage())

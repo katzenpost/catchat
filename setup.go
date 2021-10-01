@@ -70,7 +70,7 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 	}
 
 	var catshadowClient *catshadow.Client
-	cfg, linkKey, err := client.NewEphemeralClient(cfg)
+	cfg, linkKey, err := client.NewEphemeralClientConfig(cfg)
 	if err != nil {
 		result <- err
 		return
@@ -107,7 +107,7 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 		fmt.Println("catshadow client successfully created")
 	} else {
 		// Load previous state to setup our current client state.
-		stateWorker, state, err = catshadow.LoadStateWriter(backendLog.GetLogger("state_worker"), statefile, passphrase)
+		stateWorker, state, err = catshadow.LoadStateWriter(c.GetLogger("catshadow_state"), statefile, passphrase)
 		if err != nil {
 			result <- err
 			return
@@ -116,18 +116,9 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 		// Start the stateworker
 		stateWorker.Start()
 
-		// Run a Client.
-		c, err := client.New(cfg)
-		if err != nil {
-			stateWorker.Halt()
-			result <- err
-			return
-		}
-
 		// Make a catshadow Client.
 		catshadowClient, err = catshadow.New(backendLog, c, stateWorker, state)
 		if err != nil {
-			c.Shutdown()
 			stateWorker.Halt()
 			result <- err
 			return
@@ -135,6 +126,5 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 	}
 
 	// Start catshadow client.
-	catshadowClient.Start()
 	result <- catshadowClient
 }
