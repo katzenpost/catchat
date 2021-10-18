@@ -8,7 +8,6 @@ import (
 	"github.com/katzenpost/katzenpost/catshadow"
 	catconfig "github.com/katzenpost/katzenpost/catshadow/config"
 	"github.com/katzenpost/katzenpost/client"
-	"github.com/katzenpost/katzenpost/core/crypto/ecdh"
 	"path/filepath"
 )
 
@@ -29,6 +28,8 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 	var catshadowClient *catshadow.Client
 	var stateWorker *catshadow.StateWriter
 	var state *catshadow.State
+	var err error
+
 	cfg, err := catshadowCfg.ClientConfig()
 	if err != nil {
 		result <- err
@@ -72,7 +73,7 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 
 	// automatically create a statefile if one does not already exist
 	stateLogger := backendLog.GetLogger("catshadow_state")
-	if _, err := os.Stat(statefile); os.IsNotExist(err) {
+	if _, err = os.Stat(statefile); os.IsNotExist(err) {
 		stateWorker, err = catshadow.NewStateWriter(stateLogger, statefile, passphrase)
 	} else {
 		stateWorker, state, err = catshadow.LoadStateWriter(stateLogger, statefile, passphrase)
@@ -87,12 +88,6 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 	// TODO: fixme so that clients cache a consensus or set of provider descriptors
 	// which can be used to populate the config.Account section, or otherwise
 	// allow a client to be started without having config.Account set...
-	var linkKey *ecdh.PrivateKey
-	cfg, linkKey, err = client.NewEphemeralClientConfig(cfg)
-	if err != nil  {
-		result <- err
-		return
-	}
 
 	// create a client
 	c, err := client.New(cfg)
@@ -104,11 +99,10 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 	// Start the stateworker
 	stateWorker.Start()
 
-	user := linkKey.PublicKey().String()
 	// if there is no existing remote spool, create one:
-	if state.SpoolReadDescriptor == nil {
+	if state == nil || state.SpoolReadDescriptor == nil {
 		// TODO: would be nice to be able to defer spool creation if offline...
-		catshadowClient, err = catshadow.NewClientAndRemoteSpool(backendLog, c, stateWorker, user, linkKey)
+		catshadowClient, err = catshadow.NewClientAndRemoteSpool(backendLog, c, stateWorker)
 	} else {
 		catshadowClient, err = catshadow.New(backendLog, c, stateWorker, state)
 	}
