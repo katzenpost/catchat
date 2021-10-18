@@ -86,11 +86,12 @@ func (a *App) update(gtx layout.Context) {
 		case BackEvent:
 			a.stack.Pop()
 		case signInStarted:
-			p := newConnectingPage(e.result)
+			p := newUnlockPage(e.result)
 			a.stack.Clear(p)
-		case connectError:
+		case unlockError:
 			a.stack.Clear(newSignInPage(a))
-		case connectSuccess:
+		case unlockSuccess:
+			// validate the statefile somehow
 			a.c = e.client
 			a.c.Start()
 			a.stack.Clear(newHomePage(a))
