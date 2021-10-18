@@ -99,13 +99,7 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 	// Start the stateworker
 	stateWorker.Start()
 
-	// if there is no existing remote spool, create one:
-	if state == nil || state.SpoolReadDescriptor == nil {
-		// TODO: would be nice to be able to defer spool creation if offline...
-		catshadowClient, err = catshadow.NewClientAndRemoteSpool(backendLog, c, stateWorker)
-	} else {
-		catshadowClient, err = catshadow.New(backendLog, c, stateWorker, state)
-	}
+	catshadowClient, err = catshadow.New(backendLog, c, stateWorker, state)
 	if err != nil {
 		result <- err
 		c.Shutdown()
