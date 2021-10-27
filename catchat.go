@@ -52,7 +52,8 @@ var (
 		return th
 	}()
 
-	status string
+	isConnected bool
+	isConnecting bool
 )
 
 type App struct {
@@ -95,6 +96,12 @@ func (a *App) update(gtx layout.Context) {
 			a.c = e.client
 			a.c.Start()
 			a.stack.Clear(newHomePage(a))
+		case OfflineClick:
+			go a.c.Offline()
+			isConnected = false
+		case OnlineClick:
+			isConnecting = true
+			go a.c.Online() // do not block UI
 		case ShowSettingsClick:
 			a.stack.Push(newSettingsPage())
 		case AddContactClick:
@@ -313,7 +320,9 @@ func getDefaultConfig() (*catconfig.Config, error) {
 func (a *App) handleCatshadowEvent(e interface{}) error {
 	switch event := e.(type) {
 	case *client.ConnectionStatusEvent:
+		isConnecting = false
 		if event.IsConnected {
+			isConnected = true
 			go func() {
 				if n, err := notify.Push("Connected", "Catchat has connected"); err == nil {
 					<-time.After(notificationTimeout)
@@ -321,6 +330,7 @@ func (a *App) handleCatshadowEvent(e interface{}) error {
 				}
 			}()
 		} else {
+			isConnected = false
 			go func() {
 				if n, err := notify.Push("Disconnected", "Catchat has disconnected"); err == nil {
 					<-time.After(notificationTimeout)

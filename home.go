@@ -25,6 +25,8 @@ import (
 
 var (
 	contactList       = &layout.List{Axis: layout.Vertical, ScrollToEnd: false}
+	connectIcon, _    = widget.NewIcon(icons.DeviceSignalWiFi4Bar)
+	disconnectIcon, _ = widget.NewIcon(icons.DeviceSignalWiFiOff)
 	settingsIcon, _   = widget.NewIcon(icons.ActionSettings)
 	addContactIcon, _ = widget.NewIcon(icons.SocialPersonAdd)
 	logo              = getLogo()
@@ -34,6 +36,7 @@ var (
 type HomePage struct {
 	a             *App
 	addContact    *widget.Clickable
+	connect       *widget.Clickable
 	showSettings  *widget.Clickable
 	av            map[string]*widget.Image
 	contactClicks map[string]*gesture.Click
@@ -58,6 +61,12 @@ func (p *HomePage) Layout(gtx layout.Context) layout.Dimensions {
 					gtx,
 					layout.Rigid(layoutLogo),
 					layout.Flexed(1, fill{th.Bg}.Layout),
+					func() layout.FlexChild {
+						if isConnected {
+							return layout.Rigid(button(th, p.connect, connectIcon).Layout)
+						}
+						return layout.Rigid(button(th, p.connect, disconnectIcon).Layout)
+					}(),
 					layout.Rigid(button(th, p.showSettings, settingsIcon).Layout),
 					layout.Rigid(button(th, p.addContact, addContactIcon).Layout),
 				)
@@ -206,8 +215,23 @@ type ChooseContactClick struct {
 	nickname string
 }
 
+// Connect is the event that indicates client online mode is requested
+type OnlineClick struct {
+}
+
+// OfflineClick is the event that indicates client offline mode is requested
+type OfflineClick struct {
+	Err error
+}
+
 // Event returns a ChooseContactClick event when a contact is chosen
 func (p *HomePage) Event(gtx layout.Context) interface{} {
+	if p.connect.Clicked() {
+		if isConnected {
+			return OfflineClick{}
+		}
+		return OnlineClick{}
+	}
 	// listen for pointer right click events on the addContact widget
 	if p.addContact.Clicked() {
 		return AddContactClick{}
@@ -232,6 +256,7 @@ func newHomePage(a *App) *HomePage {
 	return &HomePage{
 		a:             a,
 		addContact:    &widget.Clickable{},
+		connect:       &widget.Clickable{},
 		showSettings:  &widget.Clickable{},
 		contactClicks: make(map[string]*gesture.Click),
 		av:            make(map[string]*widget.Image),
