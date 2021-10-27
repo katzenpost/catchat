@@ -267,8 +267,9 @@ func (p *AddContactPage) layoutQr(gtx C) D {
 
 	})
 	a := pointer.Rect(image.Rectangle{Max: dims.Size})
-	a.Add(gtx.Ops)
+	t := a.Push(gtx.Ops)
 	p.newQr.Add(gtx.Ops)
+	t.Pop()
 	return dims
 
 }
@@ -294,8 +295,9 @@ func (p *AddContactPage) layoutAvatar(gtx C) D {
 
 		})
 		a := pointer.Rect(image.Rectangle{Max: dims.Size})
-		a.Add(gtx.Ops)
+		t := a.Push(gtx.Ops)
 		p.newAvatar.Add(gtx.Ops)
+		t.Pop()
 		return dims
 	})
 }

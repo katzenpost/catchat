@@ -121,8 +121,9 @@ func (p *HomePage) Layout(gtx layout.Context) layout.Dimensions {
 							}),
 						)
 						a := pointer.Rect(image.Rectangle{Max: dims.Size})
-						a.Add(gtx.Ops)
+						t := a.Push(gtx.Ops)
 						p.contactClicks[contacts[i].Nickname].Add(gtx.Ops)
+						t.Pop()
 						return dims
 					})
 				})

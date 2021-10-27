@@ -105,7 +105,7 @@ func (p *AvatarPicker) Layout(gtx layout.Context) layout.Dimensions {
 							return material.Body1(th, fn.Name()).Layout(gtx)
 						})
 						a := pointer.Rect(image.Rectangle{Max: dims.Size})
-						a.Add(gtx.Ops)
+						a.Push(gtx.Ops)
 						p.clicks[fn.Name()].Add(gtx.Ops)
 						return dims
 
@@ -121,7 +121,7 @@ func (p *AvatarPicker) Layout(gtx layout.Context) layout.Dimensions {
 										return widget.Image{Scale: scale, Src: paint.NewImageOp(m)}.Layout(gtx)
 									})
 									a := pointer.Rect(image.Rectangle{Max: dims.Size})
-									a.Add(gtx.Ops)
+									a.Push(gtx.Ops)
 									if _, ok := p.clicks[fn.Name()]; !ok {
 										c := new(gesture.Click)
 										p.clicks[fn.Name()] = c
