@@ -248,15 +248,17 @@ func (c *conversationPage) Layout(gtx layout.Context) layout.Dimensions {
 						)
 					}
 					a := pointer.Rect(image.Rectangle{Max: dims.Size})
-					a.Add(gtx.Ops)
+					t := a.Push(gtx.Ops)
 					c.messageClicks[messages[i]].Add(gtx.Ops)
+					t.Pop()
 					return dims
 
 				})
 				if c.messageClicked != nil {
 					a := pointer.Rect(image.Rectangle{Max: dims.Size})
-					a.Add(gtx.Ops)
+					t := a.Push(gtx.Ops)
 					c.cancel.Add(gtx.Ops)
+					t.Pop()
 				}
 				return dims
 			})
@@ -294,10 +296,11 @@ func (c *conversationPage) Layout(gtx layout.Context) layout.Dimensions {
 					layout.Flexed(1, fill{th.Bg}.Layout),
 					layout.Flexed(5, func(gtx C) D {
 						dims := bgSender.Layout(gtx, material.Editor(th, c.compose, "").Layout)
-						pointer.PassOp{Pass: true}.Add(gtx.Ops)
+						t := pointer.PassOp{}.Push(gtx.Ops)
 						a := pointer.Rect(image.Rectangle{Max: dims.Size})
-						a.Add(gtx.Ops)
+						a.Push(gtx.Ops)
 						c.msgpaste.Add(gtx.Ops)
+						t.Pop()
 						return dims
 					}),
 					layout.Rigid(func(gtx C) D {
@@ -331,8 +334,9 @@ func (p *conversationPage) layoutAvatar(gtx C) D {
 			return layout.Dimensions{}
 		})
 		a := pointer.Rect(image.Rectangle{Max: dims.Size})
-		a.Add(gtx.Ops)
+		t := a.Push(gtx.Ops)
 		p.edit.Add(gtx.Ops)
+		t.Pop()
 		return dims
 	})
 }
