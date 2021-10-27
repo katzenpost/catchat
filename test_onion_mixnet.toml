@@ -32,14 +32,5 @@
 
 [Debug]
   DisableDecoyTraffic = false
-  CaseSensitiveUserIdentifiers = false
   PollingInterval = 500
   PreferedTransports = ["onion"]
-
-[Panda]
-  Receiver = "+panda"
-  Provider = "provider1"
-  BlobSize = 1000
-
-[Reunion]
-  Enable = false
