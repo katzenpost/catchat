@@ -3,7 +3,7 @@ docker-build-linux: docker-go-mod
 
 docker-debian-base:
 	if ! docker images|grep catchat/debian_base; then \
-		docker run --name catchat_debian_base -it golang:buster bash -c 'apt update && apt upgrade -y && apt install -y --no-install-recommends build-essential libgles2 libgles2-mesa-dev libglib2.0-dev libxkbcommon-dev libxkbcommon-x11-dev libglu1-mesa-dev libxcursor-dev libwayland-dev libx11-xcb-dev' \
+		docker run --name catchat_debian_base -it golang:buster bash -c 'apt update && apt upgrade -y && apt install -y --no-install-recommends build-essential libgles2 libgles2-mesa-dev libglib2.0-dev libxkbcommon-dev libxkbcommon-x11-dev libglu1-mesa-dev libxcursor-dev libwayland-dev libx11-xcb-dev libvulkan-dev' \
 		&& docker commit catchat_debian_base catchat/debian_base \
 		&& docker rm catchat_debian_base; \
 	fi
