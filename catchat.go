@@ -255,14 +255,6 @@ func getConfigNoTor() (*catconfig.Config, error) {
 
 [Debug]
   DisableDecoyTraffic = false
-
-[Panda]
-  Receiver = "+panda"
-  Provider = "provider1"
-  BlobSize = 1000
-
-[Reunion]
-  Enable = false
  `
 	return catconfig.Load([]byte(cfgString))
 }
@@ -305,14 +297,6 @@ func getDefaultConfig() (*catconfig.Config, error) {
   DisableDecoyTraffic = false
   PollingInterval = 500
   PreferedTransports = ["onion"]
-
-[Panda]
-  Receiver = "+panda"
-  Provider = "provider1"
-  BlobSize = 1000
-
-[Reunion]
-  Enable = false
 `
 	return catconfig.Load([]byte(cfgString))
 }
