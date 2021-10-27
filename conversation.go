@@ -297,10 +297,11 @@ func (c *conversationPage) Layout(gtx layout.Context) layout.Dimensions {
 					layout.Flexed(5, func(gtx C) D {
 						dims := bgSender.Layout(gtx, material.Editor(th, c.compose, "").Layout)
 						t := pointer.PassOp{}.Push(gtx.Ops)
+						defer t.Pop()
 						a := pointer.Rect(image.Rectangle{Max: dims.Size})
-						a.Push(gtx.Ops)
+						x := a.Push(gtx.Ops)
+						defer x.Pop()
 						c.msgpaste.Add(gtx.Ops)
-						t.Pop()
 						return dims
 					}),
 					layout.Rigid(func(gtx C) D {
