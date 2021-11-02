@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"gioui.org/gesture"
 	"gioui.org/io/clipboard"
 	"gioui.org/io/pointer"
@@ -36,12 +38,72 @@ var (
 	cancelIcon, _ = widget.NewIcon(icons.NavigationCancel)
 )
 
+// A contactal is a fractal and secret that represents a user identity
+type Contactal struct {
+	SharedSecret string
+}
+
+// NewContactal returns a new randomized Contactal
+func NewContactal() *Contactal {
+	secret := make([]byte, 32)
+	rand.Reader.Read(secret)
+	return &Contactal{SharedSecret: base64.StdEncoding.EncodeToString(secret)}
+}
+
+// Render returns a visual representation of the Contactal's SharedSecret, by
+// using a DeterministicRandReader to derive parameters for fractals.Fractal
+// and fractals.Fractal.Render
+func (c *Contactal) Render(sz image.Point) image.Image {
+	img := image.NewRGBA(image.Rectangle{Max: sz})
+	g := colors.GradientTable{}
+	var b [6]byte
+	// ensure the secret is 32b
+	s := sha256.Sum256([]byte(c.SharedSecret))
+	r, _ := rand.NewDeterministicRandReader(s[:])
+
+	// generate a random gradient table. 42 colors is arbitrary, but looks nice.
+	for i := 0; i < 42; i++ {
+		r.Read(b[:])
+		clrString := fmt.Sprintf("#%02x%02x%02x", b[:2], b[2:4], b[4:])
+		g.AddToTable(clrString, float64(i)/42.0)
+	}
+
+	// initialize a deterministic math/rand so
+	m := mrand.New(r)
+	f := &fractals.Fractal{FractType: "julia",
+		Center:       fractals.ComplexPair{m.Float64(), m.Float64()},
+		MagFactor:    1.0,
+		MaxIter:      90,
+		W:            1.0,
+		H:            1.0,
+		ImgWidth:     sz.X,
+		JuliaSeed:    fractals.ComplexPair{m.Float64(), m.Float64()},
+		InnerColor:   "#000000",
+		FullScreen:   false,
+		ColorRepeats: 2.0}
+
+	f.Render(img, g)
+	return img
+}
+
+// Generate a QR code for the serialised Contactal
+func (c *Contactal) QR() (*qrcode.QRCode, error) {
+	return qrcode.New(c.SharedSecret, qrcode.High)
+}
+
+// Reset Re-Initializes the shared secret.
+func (c *Contactal) Reset() {
+	var b [32]byte
+	rand.Reader.Read(b[:])
+	c.SharedSecret = base64.StdEncoding.EncodeToString(b[:])
+}
+
 // AddContactPage is the page for adding a new contact
 type AddContactPage struct {
 	a         *App
 	nickname  *widget.Editor
 	avatar    *widget.Image
-	palette   colors.GradientTable
+	contactal *Contactal
 	copy      *widget.Clickable
 	paste     *widget.Clickable
 	back      *widget.Clickable
@@ -50,9 +112,6 @@ type AddContactPage struct {
 	secret    *widget.Editor
 	submit    *widget.Clickable
 	cancel    *widget.Clickable
-	qr        *widget.Image
-	x, y      float64
-	xx, yy    float64
 }
 
 // Layout returns a simple centered layout prompting user for contact nickname and secret
@@ -132,10 +191,8 @@ func (p *AddContactPage) Event(gtx layout.Context) interface{} {
 
 	for _, e := range p.newQr.Events(gtx.Queue) {
 		if e.Type == gesture.TypeClick {
-			p.qr = nil
-			b := make([]byte, 32)
-			rand.Reader.Read(b)
-			p.secret.SetText(base64.StdEncoding.EncodeToString(b))
+			p.contactal.Reset()
+			p.secret.SetText(p.contactal.SharedSecret)
 		}
 	}
 
@@ -151,16 +208,15 @@ func (p *AddContactPage) Event(gtx layout.Context) interface{} {
 	for _, e := range gtx.Events(p) {
 		ce := e.(clipboard.Event)
 		p.secret.SetText(ce.Text)
+		p.contactal.SharedSecret = ce.Text
+		return RedrawEvent{}
 	}
 
 	for _, e := range p.newAvatar.Events(gtx.Queue) {
 		if e.Type == gesture.TypeClick {
-			p.avatar = nil
-			p.palette.Randomise()
-			p.xx = mrand.Float64()
-			p.x = mrand.Float64()
-			p.y = mrand.Float64()
-			p.yy = mrand.Float64()
+			p.contactal = NewContactal()
+			p.secret.SetText(p.contactal.SharedSecret)
+			return RedrawEvent{}
 		}
 	}
 
@@ -168,6 +224,9 @@ func (p *AddContactPage) Event(gtx layout.Context) interface{} {
 		switch ev.(type) {
 		case widget.SubmitEvent:
 			p.submit.Click()
+		case widget.ChangeEvent:
+			p.contactal.SharedSecret = p.secret.Text()
+			return RedrawEvent{}
 		}
 	}
 	if p.cancel.Clicked() {
@@ -188,9 +247,7 @@ func (p *AddContactPage) Event(gtx layout.Context) interface{} {
 		p.a.c.NewContact(p.nickname.Text(), []byte(p.secret.Text()))
 		b := &bytes.Buffer{}
 		sz := image.Point{X: gtx.Px(unit.Dp(96)), Y: gtx.Px(unit.Dp(96))}
-		i := image.NewRGBA(image.Rectangle{Max: sz})
-		f := p.fractal(sz)
-		f.Render(i, p.palette)
+		i := p.contactal.Render(sz)
 
 		if err := png.Encode(b, i); err == nil {
 			p.a.c.AddBlob("avatar://"+p.nickname.Text(), b.Bytes())
@@ -212,12 +269,6 @@ func newAddContactPage(a *App) *AddContactPage {
 		p.secret.Submit = false
 	}
 
-	// avatar parameters
-	p.xx = mrand.Float64()
-	p.yy = mrand.Float64()
-	p.palette = colors.GradientTable{}
-	p.palette.Randomise()
-
 	p.newAvatar = new(gesture.Click)
 	p.newQr = new(gesture.Click)
 	p.back = &widget.Clickable{}
@@ -226,22 +277,10 @@ func newAddContactPage(a *App) *AddContactPage {
 	p.submit = &widget.Clickable{}
 	p.cancel = &widget.Clickable{}
 
+	// generate random avatar parameters
+	p.contactal = NewContactal()
 	p.nickname.Focus()
 	return p
-}
-
-func (p *AddContactPage) fractal(sz image.Point) *fractals.Fractal {
-	return &fractals.Fractal{FractType: "julia",
-		Center:       fractals.ComplexPair{p.x, p.y},
-		MagFactor:    1.0,
-		MaxIter:      90,
-		W:            1.0,
-		H:            1.0,
-		ImgWidth:     sz.X,
-		JuliaSeed:    fractals.ComplexPair{p.xx, p.yy},
-		InnerColor:   "#000000",
-		FullScreen:   false,
-		ColorRepeats: 2.0}
 }
 
 func (p *AddContactPage) layoutQr(gtx C) D {
@@ -255,7 +294,7 @@ func (p *AddContactPage) layoutQr(gtx C) D {
 
 		sz := image.Point{X: x, Y: x}
 		gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(sz))
-		qr, err := qrcode.New(p.secret.Text(), qrcode.High)
+		qr, err := p.contactal.QR()
 		if err != nil {
 			return layout.Center.Layout(gtx, material.Caption(th, "QR").Layout)
 		}
@@ -287,10 +326,7 @@ func (p *AddContactPage) layoutAvatar(gtx C) D {
 			sz := image.Point{X: x, Y: x}
 
 			gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(sz))
-			f := p.fractal(sz)
-
-			i := image.NewRGBA(image.Rectangle{Max: sz})
-			f.Render(i, p.palette)
+			i := p.contactal.Render(sz)
 			return widget.Image{Scale: float32(1), Src: paint.NewImageOp(i)}.Layout(gtx)
 
 		})

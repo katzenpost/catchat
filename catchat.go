@@ -52,7 +52,7 @@ var (
 		return th
 	}()
 
-	isConnected bool
+	isConnected  bool
 	isConnecting bool
 )
 
