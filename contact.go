@@ -279,6 +279,7 @@ func newAddContactPage(a *App) *AddContactPage {
 
 	// generate random avatar parameters
 	p.contactal = NewContactal()
+	p.secret.SetText(p.contactal.SharedSecret)
 	p.nickname.Focus()
 	return p
 }

@@ -9,11 +9,6 @@
   Level = "DEBUG"
   File = ""
 
-[ClientLogging]
-  Disable = false
-  Level = "NOTICE"
-  File = ""
-
 [VotingAuthority]
 [[VotingAuthority.Peers]]
   Addresses = ["n5axysudjvjjkpy4r7hur7qfgybfaiwrfz2mqwkvnyylqxinldtao2ad.onion:30000"]

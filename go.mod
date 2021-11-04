@@ -10,7 +10,7 @@ require (
 	github.com/esiqveland/notify v0.11.0 // indirect
 	github.com/godbus/dbus/v5 v5.0.5 // indirect
 	github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd
-	github.com/katzenpost/katzenpost v0.0.7
+	github.com/katzenpost/katzenpost v0.0.8
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	golang.org/x/exp v0.0.0-20210722180016-6781d3edade3
 	golang.org/x/image v0.0.0-20210628002857-a66eb6448b8d

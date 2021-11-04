@@ -6,11 +6,6 @@
   Level = "DEBUG"
   File = ""
 
-[ClientLogging]
-  Disable = false
-  Level = "NOTICE"
-  File = ""
-
 [VotingAuthority]
 [[VotingAuthority.Peers]]
   Addresses = ["37.218.241.202:30000"]

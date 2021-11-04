@@ -179,27 +179,6 @@ func main() {
 
 	fmt.Println("Katzenpost is still pre-alpha.  DO NOT DEPEND ON IT FOR STRONG SECURITY OR ANONYMITY.")
 
-	var err error
-	// Load catshadow config file if specified or use baked-in defaults
-	if len(*clientConfigFile) != 0 {
-		catshadowCfg, err = catconfig.LoadFile(*clientConfigFile)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to load config file '%v': %v\n", *clientConfigFile, err)
-			os.Exit(-1)
-		}
-	} else {
-		// use the baked in configuration defaults if a configuration is not specified
-		if hasTor() {
-			catshadowCfg, err = getDefaultConfig()
-		} else {
-			catshadowCfg, err = getConfigNoTor()
-		}
-
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Failed to load config defaults: %v\n", err)
-			os.Exit(-1)
-		}
-	}
 	// Start graphical user interface.
 	uiMain()
 }
@@ -225,17 +204,12 @@ type (
 	D = layout.Dimensions
 )
 
-func getConfigNoTor() (*catconfig.Config, error) {
+func getConfigNoTor() (*config.Config, error) {
 	cfgString := `
 [UpstreamProxy]
   Type = "none"
 
 [Logging]
-  Disable = false
-  Level = "DEBUG"
-  File = ""
-
-[ClientLogging]
   Disable = false
   Level = "DEBUG"
   File = ""
@@ -259,10 +233,10 @@ func getConfigNoTor() (*catconfig.Config, error) {
 [Debug]
   DisableDecoyTraffic = false
  `
-	return catconfig.Load([]byte(cfgString))
+	return config.Load([]byte(cfgString))
 }
 
-func getDefaultConfig() (*catconfig.Config, error) {
+func getDefaultConfig() (*config.Config, error) {
 	cfgString := `
 [UpstreamProxy]
   Type = "socks5"
@@ -270,11 +244,6 @@ func getDefaultConfig() (*catconfig.Config, error) {
   Address = "127.0.0.1:9050"
 
 [Logging]
-  Disable = false
-  Level = "DEBUG"
-  File = ""
-
-[ClientLogging]
   Disable = false
   Level = "DEBUG"
   File = ""
@@ -300,7 +269,7 @@ func getDefaultConfig() (*catconfig.Config, error) {
   PollingInterval = 500
   PreferedTransports = ["onion"]
 `
-	return catconfig.Load([]byte(cfgString))
+	return config.Load([]byte(cfgString))
 }
 
 func (a *App) handleCatshadowEvent(e interface{}) error {

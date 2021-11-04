@@ -6,8 +6,9 @@ import (
 
 	"gioui.org/app"
 	"github.com/katzenpost/katzenpost/catshadow"
-	catconfig "github.com/katzenpost/katzenpost/catshadow/config"
+	"github.com/katzenpost/katzenpost/core/log"
 	"github.com/katzenpost/katzenpost/client"
+	"github.com/katzenpost/katzenpost/client/config"
 	"path/filepath"
 )
 
@@ -21,7 +22,7 @@ func hasTor() bool {
 	return true
 }
 
-func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result chan interface{}) {
+func setupCatShadow(passphrase []byte, result chan interface{}) {
 	// XXX: if the catshadowClient already exists, shut it down
 	// FIXME: figure out a better way to toggle connected/disconnected
 	// states and allow to retry attempts on a timeout or other failure.
@@ -29,12 +30,6 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 	var stateWorker *catshadow.StateWriter
 	var state *catshadow.State
 	var err error
-
-	cfg, err := catshadowCfg.ClientConfig()
-	if err != nil {
-		result <- err
-		return
-	}
 
 	// obtain the default data location
 	dir, err := app.DataDir()
@@ -64,12 +59,33 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 		statefile = *stateFile
 	}
 
-	// initialize logging
-	backendLog, err := catshadowCfg.InitLogBackend()
-	if err != nil {
-		result <- err
-		return
+	var cfg *config.Config
+	if len(*clientConfigFile) != 0 {
+		cfg, err = config.LoadFile(*clientConfigFile)
+		if err != nil {
+			result <- err
+			return
+		}
+	} else {
+		// use the baked in configuration defaults if a configuration is not specified
+		if hasTor() {
+			cfg, err = getDefaultConfig()
+		} else {
+			cfg, err = getConfigNoTor()
+		}
+
+		if err != nil {
+			result <- err
+			return
+		}
 	}
+
+	// initialize logging
+        backendLog, err := log.New(cfg.Logging.File, cfg.Logging.Level, cfg.Logging.Disable)
+        if err != nil {
+		result <- err
+                return
+        }
 
 	// automatically create a statefile if one does not already exist
 	stateLogger := backendLog.GetLogger("catshadow_state")
@@ -78,6 +94,8 @@ func setupCatShadow(catshadowCfg *catconfig.Config, passphrase []byte, result ch
 	} else {
 		stateWorker, state, err = catshadow.LoadStateWriter(stateLogger, statefile, passphrase)
 	}
+
+	// catches any err above
 	if err != nil {
 		result <- err
 		return
