@@ -9,7 +9,7 @@ import (
 	"syscall"
 
 	"github.com/katzenpost/katzenpost/catshadow"
-	catconfig "github.com/katzenpost/katzenpost/catshadow/config"
+	"github.com/katzenpost/katzenpost/client/config"
 	"github.com/katzenpost/katzenpost/client"
 	"time"
 
@@ -36,7 +36,6 @@ var (
 	clientConfigFile = flag.String("f", "", "Path to the client config file.")
 	stateFile        = flag.String("s", "catshadow_statefile", "Path to the client state file.")
 
-	catshadowCfg *catconfig.Config
 
 	minPasswordLen = 5 // XXX pick something reasonable
 
@@ -101,7 +100,11 @@ func (a *App) update(gtx layout.Context) {
 			isConnected = false
 		case OnlineClick:
 			isConnecting = true
-			go a.c.Online() // do not block UI
+			go func() {
+				a.c.Online()
+				// does not replace an existing spool
+				a.c.CreateRemoteSpool()
+			}()
 		case ShowSettingsClick:
 			a.stack.Push(newSettingsPage())
 		case AddContactClick:
