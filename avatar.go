@@ -56,7 +56,7 @@ func (p *AvatarPicker) Layout(gtx layout.Context) layout.Dimensions {
 			// back to Edit Contact
 			layout.Rigid(func(gtx C) D {
 				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Baseline}.Layout(gtx,
-					layout.Rigid(material.Button(th, p.back, "<").Layout),
+					layout.Rigid(button(th, p.back, backIcon).Layout),
 					layout.Flexed(1, fill{th.Bg}.Layout),
 					layout.Rigid(material.H6(th, "Choose Avatar").Layout),
 					layout.Flexed(1, fill{th.Bg}.Layout),
