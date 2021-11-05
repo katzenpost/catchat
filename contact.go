@@ -86,6 +86,25 @@ func (c *Contactal) Render(sz image.Point) image.Image {
 	return img
 }
 
+// Layout the Contactal
+func (c *Contactal) Layout(gtx C) D {
+	return layout.Center.Layout(gtx, func(gtx C) D {
+		cc := clipCircle{}
+		return cc.Layout(gtx, func(gtx C) D {
+			x := gtx.Constraints.Max.X
+			y := gtx.Constraints.Max.Y
+			if x > y {
+				x = y
+			}
+			sz := image.Point{X: x, Y: x}
+
+			gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(sz))
+			i := c.Render(sz)
+			return widget.Image{Scale: float32(1), Src: paint.NewImageOp(i)}.Layout(gtx)
+		})
+	})
+}
+
 // Generate a QR code for the serialised Contactal
 func (c *Contactal) QR() (*qrcode.QRCode, error) {
 	return qrcode.New(c.SharedSecret, qrcode.High)
@@ -137,7 +156,12 @@ func (p *AddContactPage) Layout(gtx layout.Context) layout.Dimensions {
 						return layout.Center.Layout(gtx, material.Editor(th, p.nickname, "Nickname").Layout)
 					}),
 					layout.Flexed(1, func(gtx C) D {
-						return layout.Center.Layout(gtx, p.layoutAvatar)
+						dims := p.contactal.Layout(gtx)
+						a := pointer.Rect(image.Rectangle{Max: dims.Size})
+						t := a.Push(gtx.Ops)
+						p.newAvatar.Add(gtx.Ops)
+						t.Pop()
+						return dims
 					}),
 				)
 			}),
@@ -312,31 +336,6 @@ func (p *AddContactPage) layoutQr(gtx C) D {
 	t.Pop()
 	return dims
 
-}
-func (p *AddContactPage) layoutAvatar(gtx C) D {
-	in := layout.Inset{}
-	cc := clipCircle{}
-
-	return in.Layout(gtx, func(gtx C) D {
-		dims := cc.Layout(gtx, func(gtx C) D {
-			x := gtx.Constraints.Max.X
-			y := gtx.Constraints.Max.Y
-			if x > y {
-				x = y
-			}
-			sz := image.Point{X: x, Y: x}
-
-			gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(sz))
-			i := p.contactal.Render(sz)
-			return widget.Image{Scale: float32(1), Src: paint.NewImageOp(i)}.Layout(gtx)
-
-		})
-		a := pointer.Rect(image.Rectangle{Max: dims.Size})
-		t := a.Push(gtx.Ops)
-		p.newAvatar.Add(gtx.Ops)
-		t.Pop()
-		return dims
-	})
 }
 
 type sortedContacts []*catshadow.Contact

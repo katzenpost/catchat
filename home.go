@@ -11,14 +11,11 @@ import (
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
-	"github.com/benc-uk/gofract/pkg/colors"
-	"github.com/benc-uk/gofract/pkg/fractals"
 	"github.com/hako/durafmt"
 	"github.com/katzenpost/catchat/assets"
+	"github.com/katzenpost/katzenpost/catshadow"
 	"golang.org/x/exp/shiny/materialdesign/icons"
 	"image"
-	"image/png"
-	"math/rand"
 	"strings"
 	"time"
 )
@@ -90,8 +87,8 @@ func (p *HomePage) Layout(gtx layout.Context) layout.Dimensions {
 
 						dims := layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceEvenly}.Layout(gtx,
 							// contact avatar
-							layout.Rigid(func(gtx C) D {
-								return p.layoutAvatar(gtx, contacts[i].Nickname)
+							layout.Flexed(.2, func(gtx C) D {
+								return layoutAvatar(gtx, contacts[i])
 							}),
 							// contact name and last message
 							layout.Flexed(1, func(gtx C) D {
@@ -159,54 +156,22 @@ func layoutLogo(gtx C) D {
 	})
 }
 
-func (p *HomePage) layoutAvatar(gtx C, nickname string) D {
-	cc := clipCircle{}
-	return cc.Layout(gtx, func(gtx C) D {
-		sz := image.Point{X: gtx.Px(unit.Dp(96)), Y: gtx.Px(unit.Dp(96))}
-		gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(sz))
-		if cachedAv, ok := p.av[nickname]; ok {
-			return cachedAv.Layout(gtx)
-		}
-		// render the saved avatar image, if present
-		if b, err := p.a.c.GetBlob("avatar://" + nickname); err == nil {
-			if m, _, err := image.Decode(bytes.NewReader(b)); err == nil {
-				scale := float32(sz.X) / float32(m.Bounds().Size().X)
-				av := &widget.Image{Scale: scale, Src: paint.NewImageOp(m)}
-				p.av[nickname] = av
-				return av.Layout(gtx)
-			} else {
-				panic(err)
+func layoutAvatar(gtx C, c *catshadow.Contact) D {
+	return layout.Center.Layout(gtx, func(gtx C) D {
+		cc := clipCircle{}
+		return cc.Layout(gtx, func(gtx C) D {
+			x := gtx.Constraints.Max.X
+			y := gtx.Constraints.Max.Y
+			if x > y {
+				x = y
 			}
-		}
-		// generate an avatar
-		// complexPair JuliaSeed
-		f := fractals.Fractal{FractType: "julia",
-			Center: fractals.ComplexPair{rand.Float64(), rand.Float64()},
-			//Center: fractals.ComplexPair{-0.6, 0.0},
-			MagFactor: 1.0,
-			MaxIter:   90,
-			W:         3.0,
-			H:         2.0,
-			ImgWidth:  sz.X,
-			JuliaSeed: fractals.ComplexPair{rand.Float64(), rand.Float64()},
-			//JuliaSeed: fractals.ComplexPair{0.355, 0.355},
-			InnerColor:   "#000000",
-			FullScreen:   false,
-			ColorRepeats: 2.0,
-		}
-
-		i := image.NewRGBA(image.Rectangle{Max: sz})
-		palette := colors.GradientTable{}
-		palette.Randomise()
-		f.Render(i, palette)
-		b := &bytes.Buffer{}
-		if err := png.Encode(b, i); err == nil {
-			p.a.c.AddBlob("avatar://"+nickname, b.Bytes())
-		}
-		scale := 1.0
-		av := &widget.Image{Scale: float32(scale), Src: paint.NewImageOp(i)}
-		p.av[nickname] = av
-		return av.Layout(gtx)
+			sz := image.Point{X: x, Y: x}
+			gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(sz))
+			co := Contactal{SharedSecret: string(c.SharedSecret)}
+			i := co.Render(sz)
+			av := &widget.Image{Scale: 1.0, Src: paint.NewImageOp(i)}
+			return av.Layout(gtx)
+		})
 	})
 }
 
