@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"gioui.org/gesture"
 	"gioui.org/io/pointer"
 	"gioui.org/layout"
@@ -8,6 +9,7 @@ import (
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"image"
+	"image/png"
 )
 
 // EditContactPage is the page for adding a new contact
@@ -75,12 +77,13 @@ func (p *EditContactPage) Event(gtx layout.Context) interface{} {
 	}
 	for _, e := range p.avatar.Events(gtx.Queue) {
 		if e.Type == gesture.TypeClick {
-			c := p.a.c.GetContacts()[p.nickname]
-			if c.IsPending {
-				p.a.c.DeleteBlob("avatar://" + p.nickname)
-				ct := Contactal{}
-				ct.Reset()
-				c.SharedSecret = []byte(ct.SharedSecret)
+			ct := Contactal{}
+			ct.Reset()
+			sz := image.Point{X: gtx.Px(unit.Dp(96)), Y: gtx.Px(unit.Dp(96))}
+			i := ct.Render(sz)
+			b := new(bytes.Buffer)
+			if err := png.Encode(b, i); err == nil {
+				p.a.c.AddBlob("avatar://"+p.nickname, b.Bytes())
 				return RedrawEvent{}
 			}
 		}
