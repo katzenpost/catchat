@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"gioui.org/app"
+	_ "gioui.org/app/permission/storage"
 	"gioui.org/font/gofont"
 	"gioui.org/io/key"
 	"gioui.org/io/system"

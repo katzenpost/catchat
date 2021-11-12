@@ -17,6 +17,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -53,13 +54,7 @@ func (p *AvatarPicker) Layout(gtx layout.Context) layout.Dimensions {
 					layout.Flexed(1, fill{th.Bg}.Layout),
 				)
 			}),
-			// cwd and buttons
-			layout.Rigid(func(gtx C) D {
-				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Baseline}.Layout(gtx,
-					layout.Rigid(material.Button(th, p.up, "..").Layout),
-					layout.Flexed(1, material.Body1(th, p.path).Layout),
-				)
-			}),
+			// avatar icon
 			layout.Rigid(func(gtx C) D {
 				dims := layout.Center.Layout(gtx, func(gtx C) D {
 					return layoutAvatar(gtx, p.a.c, p.nickname)
@@ -69,6 +64,13 @@ func (p *AvatarPicker) Layout(gtx layout.Context) layout.Dimensions {
 				p.avatar.Add(gtx.Ops)
 				t.Pop()
 				return dims
+			}),
+			// cwd and buttons
+			layout.Rigid(func(gtx C) D {
+				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Baseline}.Layout(gtx,
+					layout.Rigid(material.Button(th, p.up, "..").Layout),
+					layout.Flexed(1, material.Body1(th, p.path).Layout),
+				)
 			}),
 			// list contents
 			layout.Flexed(1, func(gtx C) D {
@@ -193,6 +195,10 @@ func (p *AvatarPicker) Start(stop <-chan struct{}) {
 
 func newAvatarPicker(a *App, nickname string) *AvatarPicker {
 	cwd, _ := app.DataDir() // XXX: select media/storage on android
+	if runtime.GOOS == "android" {
+		cwd = "/sdcard/"
+	}
+
 	return &AvatarPicker{up: &widget.Clickable{},
 		a:        a,
 		avatar:   &gesture.Click{},
