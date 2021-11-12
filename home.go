@@ -16,6 +16,7 @@ import (
 	"github.com/katzenpost/katzenpost/catshadow"
 	"golang.org/x/exp/shiny/materialdesign/icons"
 	"image"
+	"image/png"
 	"strings"
 	"time"
 )
@@ -28,6 +29,7 @@ var (
 	addContactIcon, _ = widget.NewIcon(icons.SocialPersonAdd)
 	logo              = getLogo()
 	units, _          = durafmt.UnitsCoder{PluralSep: ":", UnitsSep: ","}.Decode("y:y,w:w,d:d,h:h,m:m,s:s,ms:ms,us:us")
+	avatars           = make(map[string]layout.Widget)
 )
 
 type HomePage struct {
@@ -87,8 +89,8 @@ func (p *HomePage) Layout(gtx layout.Context) layout.Dimensions {
 
 						dims := layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceEvenly}.Layout(gtx,
 							// contact avatar
-							layout.Flexed(.2, func(gtx C) D {
-								return layoutAvatar(gtx, contacts[i])
+							layout.Rigid(func(gtx C) D {
+								return layoutAvatar(gtx, p.a.c, contacts[i].Nickname)
 							}),
 							// contact name and last message
 							layout.Flexed(1, func(gtx C) D {
@@ -156,21 +158,36 @@ func layoutLogo(gtx C) D {
 	})
 }
 
-func layoutAvatar(gtx C, c *catshadow.Contact) D {
+func layoutAvatar(gtx C, c *catshadow.Client, nickname string) D {
 	return layout.Center.Layout(gtx, func(gtx C) D {
 		cc := clipCircle{}
 		return cc.Layout(gtx, func(gtx C) D {
-			x := gtx.Constraints.Max.X
-			y := gtx.Constraints.Max.Y
-			if x > y {
-				x = y
-			}
-			sz := image.Point{X: x, Y: x}
+			sz := image.Point{X: gtx.Px(unit.Dp(42)), Y: gtx.Px(unit.Dp(42))}
 			gtx.Constraints = layout.Exact(gtx.Constraints.Constrain(sz))
-			co := Contactal{SharedSecret: string(c.SharedSecret)}
-			i := co.Render(sz)
-			av := &widget.Image{Scale: 1.0, Src: paint.NewImageOp(i)}
-			return av.Layout(gtx)
+			if w, ok := avatars[nickname]; ok {
+				return w(gtx)
+			} else {
+				if b, err := c.GetBlob("avatar://" + nickname); err == nil {
+					if m, _, err := image.Decode(bytes.NewReader(b)); err == nil {
+						scale := float32(sz.X) / float32(m.Bounds().Size().X)
+						w = func(gtx C) D {
+							return widget.Image{Scale: scale, Src: paint.NewImageOp(m)}.Layout(gtx)
+						}
+					}
+				} else {
+					co := Contactal{SharedSecret: nickname}
+					i := co.Render(sz)
+					b := &bytes.Buffer{}
+					if err := png.Encode(b, i); err == nil {
+						c.AddBlob("avatar://"+nickname, b.Bytes())
+					}
+					w = func(gtx C) D {
+						return widget.Image{Scale: 1.0, Src: paint.NewImageOp(i)}.Layout(gtx)
+					}
+				}
+				avatars[nickname] = w
+				return w(gtx)
+			}
 		})
 	})
 }

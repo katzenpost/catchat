@@ -84,6 +84,7 @@ func (p *EditContactPage) Event(gtx layout.Context) interface{} {
 			b := new(bytes.Buffer)
 			if err := png.Encode(b, i); err == nil {
 				p.a.c.AddBlob("avatar://"+p.nickname, b.Bytes())
+				delete(avatars, p.nickname)
 				return RedrawEvent{}
 			}
 		}
@@ -121,7 +122,7 @@ func newEditContactPage(a *App, contact string) *EditContactPage {
 		func(gtx C) D {
 			dims := layout.Center.Layout(gtx, func(gtx C) D {
 				gtx.Constraints.Max.X = gtx.Constraints.Max.X / 4
-				return layoutAvatar(gtx, p.a.c.GetContacts()[p.nickname])
+				return layoutAvatar(gtx, p.a.c, p.nickname)
 			})
 			a := pointer.Rect(image.Rectangle{Max: dims.Size})
 			t := a.Push(gtx.Ops)

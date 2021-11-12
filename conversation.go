@@ -186,8 +186,8 @@ func (c *conversationPage) Layout(gtx layout.Context) layout.Dimensions {
 			return bgl.Layout(gtx, func(gtx C) D {
 				return layout.Flex{Axis: layout.Horizontal, Spacing: layout.SpaceBetween, Alignment: layout.Middle}.Layout(gtx,
 					layout.Rigid(button(th, c.back, backIcon).Layout),
-					layout.Flexed(.2, func(gtx C) D {
-						dims := layoutAvatar(gtx, contact)
+					layout.Rigid(func(gtx C) D {
+						dims := layoutAvatar(gtx, c.a.c, c.nickname)
 						a := pointer.Rect(image.Rectangle{Max: dims.Size})
 						t := a.Push(gtx.Ops)
 						c.edit.Add(gtx.Ops)
