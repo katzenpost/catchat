@@ -9,8 +9,8 @@ import (
 	"syscall"
 
 	"github.com/katzenpost/katzenpost/catshadow"
-	"github.com/katzenpost/katzenpost/client/config"
 	"github.com/katzenpost/katzenpost/client"
+	"github.com/katzenpost/katzenpost/client/config"
 	"time"
 
 	"gioui.org/app"
@@ -35,7 +35,6 @@ var (
 	dataDirName      = "catshadow"
 	clientConfigFile = flag.String("f", "", "Path to the client config file.")
 	stateFile        = flag.String("s", "catshadow_statefile", "Path to the client state file.")
-
 
 	minPasswordLen = 5 // XXX pick something reasonable
 

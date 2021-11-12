@@ -6,9 +6,9 @@ import (
 
 	"gioui.org/app"
 	"github.com/katzenpost/katzenpost/catshadow"
-	"github.com/katzenpost/katzenpost/core/log"
 	"github.com/katzenpost/katzenpost/client"
 	"github.com/katzenpost/katzenpost/client/config"
+	"github.com/katzenpost/katzenpost/core/log"
 	"path/filepath"
 )
 
@@ -81,11 +81,11 @@ func setupCatShadow(passphrase []byte, result chan interface{}) {
 	}
 
 	// initialize logging
-        backendLog, err := log.New(cfg.Logging.File, cfg.Logging.Level, cfg.Logging.Disable)
-        if err != nil {
+	backendLog, err := log.New(cfg.Logging.File, cfg.Logging.Level, cfg.Logging.Disable)
+	if err != nil {
 		result <- err
-                return
-        }
+		return
+	}
 
 	// automatically create a statefile if one does not already exist
 	stateLogger := backendLog.GetLogger("catshadow_state")

@@ -16,7 +16,9 @@ func (p *unlockPage) Layout(gtx layout.Context) layout.Dimensions {
 		Inset: layout.Inset{},
 	}
 
-	return bg.Layout(gtx, func(gtx C) D { return layout.Center.Layout(gtx, material.Caption(th, "Decrypting statefile...").Layout) })
+	return bg.Layout(gtx, func(gtx C) D {
+		return layout.Center.Layout(gtx, material.Caption(th, "Decrypting statefile...").Layout)
+	})
 }
 
 func (p *unlockPage) Start(stop <-chan struct{}) {
