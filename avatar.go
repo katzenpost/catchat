@@ -26,22 +26,13 @@ var (
 
 type AvatarPicker struct {
 	a        *App
+	avatar   *gesture.Click
 	nickname string
 	path     string
 	back     *widget.Clickable
 	clear    *widget.Clickable
 	up       *widget.Clickable
 	clicks   map[string]*gesture.Click
-}
-
-// AvatarSelected is the event that indicates a chosen avatar image
-type AvatarSelected struct {
-	nickname, path string
-}
-
-// AvatarCleared is the event that indicates avatars must be redrawn
-type AvatarCleared struct {
-	nickname string
 }
 
 // Layout displays a file chooser for supported image types
@@ -66,9 +57,18 @@ func (p *AvatarPicker) Layout(gtx layout.Context) layout.Dimensions {
 			layout.Rigid(func(gtx C) D {
 				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Baseline}.Layout(gtx,
 					layout.Rigid(material.Button(th, p.up, "..").Layout),
-					layout.Rigid(material.Button(th, p.clear, "Random").Layout),
 					layout.Flexed(1, material.Body1(th, p.path).Layout),
 				)
+			}),
+			layout.Rigid(func(gtx C) D {
+				dims := layout.Center.Layout(gtx, func(gtx C) D {
+					return layoutAvatar(gtx, p.a.c, p.nickname)
+				})
+				a := pointer.Rect(image.Rectangle{Max: dims.Size})
+				t := a.Push(gtx.Ops)
+				p.avatar.Add(gtx.Ops)
+				t.Pop()
+				return dims
 			}),
 			// list contents
 			layout.Flexed(1, func(gtx C) D {
@@ -143,10 +143,6 @@ func (p *AvatarPicker) Layout(gtx layout.Context) layout.Dimensions {
 }
 
 func (p *AvatarPicker) Event(gtx C) interface{} {
-	if p.clear.Clicked() {
-		p.a.clearAvatar(p.nickname)
-		return AvatarCleared{nickname: p.nickname}
-	}
 	if p.up.Clicked() {
 		if u, err := filepath.Abs(filepath.Join(p.path, "..")); err == nil {
 			p.path = u
@@ -155,6 +151,21 @@ func (p *AvatarPicker) Event(gtx C) interface{} {
 	}
 	if p.back.Clicked() {
 		return BackEvent{}
+	}
+
+	for _, e := range p.avatar.Events(gtx.Queue) {
+		if e.Type == gesture.TypeClick {
+			ct := Contactal{}
+			ct.Reset()
+			sz := image.Point{X: gtx.Px(unit.Dp(96)), Y: gtx.Px(unit.Dp(96))}
+			i := ct.Render(sz)
+			b := new(bytes.Buffer)
+			if err := png.Encode(b, i); err == nil {
+				p.a.c.AddBlob("avatar://"+p.nickname, b.Bytes())
+				delete(avatars, p.nickname)
+				return RedrawEvent{}
+			}
+		}
 	}
 
 	for filename, click := range p.clicks {
@@ -167,7 +178,7 @@ func (p *AvatarPicker) Event(gtx C) interface{} {
 						if f.IsDir() {
 							p.path = u
 						} else {
-							return AvatarSelected{nickname: p.nickname, path: u}
+							p.a.setAvatar(p.nickname, u)
 						}
 					}
 				}
@@ -184,6 +195,7 @@ func newAvatarPicker(a *App, nickname string) *AvatarPicker {
 	cwd, _ := app.DataDir() // XXX: select media/storage on android
 	return &AvatarPicker{up: &widget.Clickable{},
 		a:        a,
+		avatar:   &gesture.Click{},
 		nickname: nickname,
 		back:     &widget.Clickable{},
 		clear:    &widget.Clickable{},
@@ -197,10 +209,6 @@ func scale(src image.Image, rect image.Rectangle, scale draw.Scaler) image.Image
 	return dst
 }
 
-func (a *App) clearAvatar(nickname string) {
-	a.c.DeleteBlob("avatar://" + nickname)
-}
-
 func (a *App) setAvatar(nickname, path string) {
 	if b, err := ioutil.ReadFile(path); err == nil {
 		// scale file
@@ -210,6 +218,7 @@ func (a *App) setAvatar(nickname, path string) {
 			b := &bytes.Buffer{}
 			if err := png.Encode(b, resized); err == nil {
 				a.c.AddBlob("avatar://"+nickname, b.Bytes())
+				delete(avatars, nickname)
 			}
 		}
 	} else {

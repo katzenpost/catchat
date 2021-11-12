@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"gioui.org/gesture"
 	"gioui.org/io/pointer"
 	"gioui.org/layout"
@@ -9,7 +8,6 @@ import (
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"image"
-	"image/png"
 )
 
 // EditContactPage is the page for adding a new contact
@@ -24,7 +22,6 @@ type EditContactPage struct {
 	remove   *widget.Clickable
 	settings *layout.List
 	widgets  []layout.Widget
-	//avatar // select an avatar image
 }
 
 // Layout returns the contact options menu
@@ -77,16 +74,7 @@ func (p *EditContactPage) Event(gtx layout.Context) interface{} {
 	}
 	for _, e := range p.avatar.Events(gtx.Queue) {
 		if e.Type == gesture.TypeClick {
-			ct := Contactal{}
-			ct.Reset()
-			sz := image.Point{X: gtx.Px(unit.Dp(96)), Y: gtx.Px(unit.Dp(96))}
-			i := ct.Render(sz)
-			b := new(bytes.Buffer)
-			if err := png.Encode(b, i); err == nil {
-				p.a.c.AddBlob("avatar://"+p.nickname, b.Bytes())
-				delete(avatars, p.nickname)
-				return RedrawEvent{}
-			}
+			return ChooseAvatar{nickname: p.nickname}
 		}
 	}
 	if p.clear.Clicked() {
@@ -121,7 +109,6 @@ func newEditContactPage(a *App, contact string) *EditContactPage {
 	p.widgets = []layout.Widget{
 		func(gtx C) D {
 			dims := layout.Center.Layout(gtx, func(gtx C) D {
-				gtx.Constraints.Max.X = gtx.Constraints.Max.X / 4
 				return layoutAvatar(gtx, p.a.c, p.nickname)
 			})
 			a := pointer.Rect(image.Rectangle{Max: dims.Size})
