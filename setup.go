@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"net"
 	"os"
 
@@ -67,13 +68,7 @@ func setupCatShadow(passphrase []byte, result chan interface{}) {
 			return
 		}
 	} else {
-		// use the baked in configuration defaults if a configuration is not specified
-		if hasTor() {
-			cfg, err = getDefaultConfig()
-		} else {
-			cfg, err = getConfigNoTor()
-		}
-
+		cfg, err = getConfigNoTor()
 		if err != nil {
 			result <- err
 			return
@@ -101,11 +96,29 @@ func setupCatShadow(passphrase []byte, result chan interface{}) {
 		return
 	}
 
-	// NewEphemeralClientConfig requires network connectivity to fetch a
-	// pki.Document and select a provider.
-	// TODO: fixme so that clients cache a consensus or set of provider descriptors
-	// which can be used to populate the config.Account section, or otherwise
-	// allow a client to be started without having config.Account set...
+	// apply any persistent settings that are needed before bootstrapping client
+	if state.Blob != nil {
+		if _, ok := state.Blob["UseTor"]; ok {
+			if len(*clientConfigFile) != 0 {
+				// a user-supplied configuration file was specified
+				if cfg.UpstreamProxy.Type != "socks5" {
+					result <- errors.New("User supplied configuration and client settings mismatch! UseTor option selected without valid UpstreamProxy!")
+					return
+				}
+			}
+			if !hasTor() {
+				warnNoTor()
+				// disable autoconnect
+				delete(state.Blob, "AutoConnect")
+			} else {
+				cfg, err = getDefaultConfig()
+				if err != nil {
+					result <- err
+					return
+				}
+			}
+		}
+	}
 
 	// create a client
 	c, err := client.New(cfg)

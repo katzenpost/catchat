@@ -88,12 +88,21 @@ func (a *App) update(gtx layout.Context) {
 		case signInStarted:
 			p := newUnlockPage(e.result)
 			a.stack.Clear(p)
-		case unlockError:
+		case unlockError, restartClient:
+			isConnected = false
+			isConnecting = false
 			a.stack.Clear(newSignInPage(a))
 		case unlockSuccess:
 			// validate the statefile somehow
 			a.c = e.client
 			a.c.Start()
+			if _, err := a.c.GetBlob("AutoConnect"); err == nil {
+				isConnecting = true
+				go func() {
+					a.c.Online()
+					a.c.CreateRemoteSpool()
+				}()
+			}
 			a.stack.Clear(newHomePage(a))
 		case OfflineClick:
 			go a.c.Offline()
@@ -106,7 +115,7 @@ func (a *App) update(gtx layout.Context) {
 				a.c.CreateRemoteSpool()
 			}()
 		case ShowSettingsClick:
-			a.stack.Push(newSettingsPage())
+			a.stack.Push(newSettingsPage(a))
 		case AddContactClick:
 			a.stack.Push(newAddContactPage(a))
 		case AddContactComplete:
@@ -151,8 +160,6 @@ func (a *App) run() error {
 			if err := a.handleCatshadowEvent(e); err != nil {
 				return err
 			}
-		case <-a.c.HaltCh():
-			return errors.New("client halted unexpectedly")
 		case e := <-a.w.Events():
 			if err := a.handleGioEvents(e); err != nil {
 				return err
