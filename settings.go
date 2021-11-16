@@ -7,14 +7,12 @@ import (
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"gioui.org/x/component"
-	"unicode"
 )
 
 // SettingsPage is for user settings
 type SettingsPage struct {
 	back          *widget.Clickable
 	useTor        *widget.Editor
-	eraseMessages *widget.Editor
 	submit        *widget.Clickable
 }
 
@@ -61,30 +59,6 @@ func (p *SettingsPage) Layout(gtx layout.Context) layout.Dimensions {
 							}
 						}
 						return inset.Layout(gtx, material.Switch(th, &switchUseTor).Layout)
-					}),
-				)
-			}),
-			layout.Rigid(func(gtx C) D {
-				return layout.Flex{Alignment: layout.Middle}.Layout(gtx,
-					layout.Flexed(settingNameColumnWidth, func(gtx C) D {
-						return inset.Layout(gtx, material.Body1(th, "Erase Messages After").Layout)
-					}),
-					layout.Flexed(settingDetailsColumnWidth, func(gtx C) D {
-						if err := func() string {
-							for _, r := range inputEraseMessages.Text() {
-								if !unicode.IsDigit(r) {
-									return "Must contain only single digits"
-								}
-							}
-							return ""
-						}(); err != "" {
-							inputEraseMessages.SetError(err)
-						} else {
-							inputEraseMessages.ClearError()
-						}
-						inputEraseMessages.SingleLine = true
-						inputEraseMessages.Alignment = inputAlignment
-						return inputEraseMessages.Layout(gtx, th, "Days")
 					}),
 				)
 			}),

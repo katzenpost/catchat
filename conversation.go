@@ -131,7 +131,7 @@ func (c *conversationPage) Event(gtx layout.Context) interface{} {
 	return nil
 }
 
-func layoutMessage(gtx C, msg *catshadow.Message, isSelected bool) D {
+func layoutMessage(gtx C, msg *catshadow.Message, isSelected bool, expires time.Duration) D {
 
 	status := ""
 	if msg.Outbound == true {
@@ -150,6 +150,12 @@ func layoutMessage(gtx C, msg *catshadow.Message, isSelected bool) D {
 			in := layout.Inset{Top: unit.Dp(8), Bottom: unit.Dp(0), Left: unit.Dp(8), Right: unit.Dp(8)}
 			return in.Layout(gtx, func(gtx C) D {
 				timeLabel := strings.Replace(durafmt.ParseShort(time.Now().Round(0).Sub(msg.Timestamp).Truncate(time.Minute)).Format(units), "0 s", "now", 1)
+				var whenExpires string
+				if expires == 0 {
+					whenExpires = ""
+				} else {
+					whenExpires = durafmt.ParseShort(msg.Timestamp.Add(expires).Sub(time.Now().Round(0).Truncate(time.Minute))).Format(units) + " remaining"
+				}
 				if isSelected {
 					timeLabel = msg.Timestamp.Truncate(time.Minute).Format(time.RFC822)
 					if msg.Outbound {
@@ -160,6 +166,7 @@ func layoutMessage(gtx C, msg *catshadow.Message, isSelected bool) D {
 				}
 				return layout.Flex{Axis: layout.Horizontal, Alignment: layout.End, Spacing: layout.SpaceBetween}.Layout(gtx,
 					layout.Rigid(material.Caption(th, timeLabel).Layout),
+					layout.Rigid(material.Caption(th, whenExpires).Layout),
 					layout.Rigid(material.Caption(th, status).Layout),
 				)
 			})
@@ -176,6 +183,7 @@ func (c *conversationPage) Layout(gtx layout.Context) layout.Dimensions {
 		}
 	}
 	messages := c.a.c.GetSortedConversation(c.nickname)
+	expires, _ := c.a.c.GetExpiration(c.nickname)
 	bgl := Background{
 		Color: th.Bg,
 		Inset: layout.Inset{Top: unit.Dp(0), Bottom: unit.Dp(0), Left: unit.Dp(0), Right: unit.Dp(0)},
@@ -235,7 +243,7 @@ func (c *conversationPage) Layout(gtx layout.Context) layout.Dimensions {
 							layout.Flexed(5, func(gtx C) D {
 								return inbetween.Layout(gtx, func(gtx C) D {
 									return bgSender.Layout(gtx, func(gtx C) D {
-										return layoutMessage(gtx, messages[i], isSelected)
+										return layoutMessage(gtx, messages[i], isSelected, expires)
 									})
 								})
 							}),
@@ -245,7 +253,7 @@ func (c *conversationPage) Layout(gtx layout.Context) layout.Dimensions {
 							layout.Flexed(5, func(gtx C) D {
 								return inbetween.Layout(gtx, func(gtx C) D {
 									return bgReceiver.Layout(gtx, func(gtx C) D {
-										return layoutMessage(gtx, messages[i], isSelected)
+										return layoutMessage(gtx, messages[i], isSelected, expires)
 									})
 								})
 							}),
