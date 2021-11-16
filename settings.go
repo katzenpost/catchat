@@ -84,7 +84,6 @@ func newSettingsPage() *SettingsPage {
 	p := &SettingsPage{}
 	p.back = &widget.Clickable{}
 	p.useTor = &widget.Editor{SingleLine: true, Submit: true}
-	p.eraseMessages = &widget.Editor{SingleLine: true, Submit: true}
 	p.submit = &widget.Clickable{}
 	return p
 }
