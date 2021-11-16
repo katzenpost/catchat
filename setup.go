@@ -96,26 +96,40 @@ func setupCatShadow(passphrase []byte, result chan interface{}) {
 		return
 	}
 
+	// create a default statefile with default options on first run
+	if state == nil {
+		// create a default statefile
+		state = &catshadow.State{
+			Contacts:      make([]*catshadow.Contact, 0),
+			Conversations: make(map[string]map[catshadow.MessageID]*catshadow.Message),
+		}
+	}
+
+	// initialize default options
+	if state.Blob == nil {
+		state.Blob = make(map[string][]byte)
+		state.Blob["UseTor"] = []byte{1}
+		state.Blob["AutoConnect"] = []byte{1}
+	}
+
 	// apply any persistent settings that are needed before bootstrapping client
-	if state != nil && state.Blob != nil {
-		if _, ok := state.Blob["UseTor"]; ok {
-			if len(*clientConfigFile) != 0 {
-				// a user-supplied configuration file was specified
-				if cfg.UpstreamProxy.Type != "socks5" {
-					result <- errors.New("User supplied configuration and client settings mismatch! UseTor option selected without valid UpstreamProxy!")
-					return
-				}
+	if _, ok := state.Blob["UseTor"]; ok {
+		if len(*clientConfigFile) != 0 {
+			// a user-supplied configuration file was specified
+			if cfg.UpstreamProxy.Type != "socks5" {
+				result <- errors.New("User supplied configuration and client settings mismatch! UseTor option selected without valid UpstreamProxy!")
+				return
 			}
-			if !hasTor() {
-				warnNoTor()
-				// disable autoconnect
-				delete(state.Blob, "AutoConnect")
-			} else {
-				cfg, err = getDefaultConfig()
-				if err != nil {
-					result <- err
-					return
-				}
+		}
+		if !hasTor() {
+			warnNoTor()
+			// disable autoconnect
+			delete(state.Blob, "AutoConnect")
+		} else {
+			cfg, err = getDefaultConfig()
+			if err != nil {
+				result <- err
+				return
 			}
 		}
 	}
