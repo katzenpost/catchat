@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"syscall"
 
 	"github.com/katzenpost/katzenpost/catshadow"
 	"github.com/katzenpost/katzenpost/client"
@@ -173,10 +172,6 @@ func (a *App) run() error {
 
 func main() {
 	flag.Parse()
-
-	// Set the umask to something "paranoid".
-	syscall.Umask(0077)
-
 	fmt.Println("Katzenpost is still pre-alpha.  DO NOT DEPEND ON IT FOR STRONG SECURITY OR ANONYMITY.")
 
 	// Start graphical user interface.

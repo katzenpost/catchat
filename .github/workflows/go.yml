@@ -21,8 +21,11 @@ jobs:
           sudo apt-get update
           sudo apt-get --no-install-recommends install build-essential libgles2 libgles2-mesa-dev libglib2.0-dev libxkbcommon-dev libxkbcommon-x11-dev libglu1-mesa-dev libxcursor-dev libwayland-dev libx11-xcb-dev libvulkan-dev
 
-      - name: Build
+      - name: Build for linux
         run: go build
+
+      - name: Build for windows
+        run: GOOS=windows go build -ldflags="-H windowsgui"
 
       - name: Create release
         id: create_release
@@ -34,7 +37,7 @@ jobs:
           release_name: Testing ${{ github.sha}}
           prerelease: true
 
-      - name: Upload catchat x86_64
+      - name: Upload catchat linux x86_64
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -42,6 +45,16 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./catchat
           asset_name: catchat-linux
+          asset_content_type: application/binary
+
+      - name: Upload catchat windows x86_64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./catchat.exe
+          asset_name: catchat.exe
           asset_content_type: application/binary
 
       - name: Build android_build docker image
