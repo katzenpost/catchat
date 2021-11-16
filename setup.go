@@ -97,7 +97,7 @@ func setupCatShadow(passphrase []byte, result chan interface{}) {
 	}
 
 	// apply any persistent settings that are needed before bootstrapping client
-	if state.Blob != nil {
+	if state != nil && state.Blob != nil {
 		if _, ok := state.Blob["UseTor"]; ok {
 			if len(*clientConfigFile) != 0 {
 				// a user-supplied configuration file was specified
