@@ -47,12 +47,12 @@ func (cc *clipCircle) Layout(gtx layout.Context, w layout.Widget) layout.Dimensi
 	}
 	szf := float32(max)
 	rr := szf * .5
-	defer op.Save(gtx.Ops).Load()
-	clip.RRect{
+	t := clip.RRect{
 		Rect: f32.Rectangle{Max: f32.Point{X: szf, Y: szf}},
 		NE:   rr, NW: rr, SE: rr, SW: rr,
-	}.Add(gtx.Ops)
+	}.Push(gtx.Ops)
 	call.Add(gtx.Ops)
+	t.Pop()
 	return dims
 }
 
@@ -60,7 +60,6 @@ func (b *Background) Layout(gtx layout.Context, w layout.Widget) layout.Dimensio
 	macro := op.Record(gtx.Ops)
 	dims := b.Inset.Layout(gtx, w)
 	call := macro.Stop()
-	defer op.Save(gtx.Ops).Load()
 	size := dims.Size
 	width, height := float32(size.X), float32(size.Y)
 	if r := float32(gtx.Px(b.Radius)); r > 0 {
@@ -70,11 +69,12 @@ func (b *Background) Layout(gtx layout.Context, w layout.Widget) layout.Dimensio
 		if r > height/2 {
 			r = height / 2
 		}
-		clip.RRect{
+		t := clip.RRect{
 			Rect: f32.Rectangle{Max: f32.Point{
 				X: width, Y: height,
 			}}, NW: r, NE: r, SW: r, SE: r,
-		}.Add(gtx.Ops)
+		}.Push(gtx.Ops)
+		defer t.Pop()
 	}
 	paint.FillShape(gtx.Ops, b.Color, clip.Rect(image.Rectangle{Max: size}).Op())
 	call.Add(gtx.Ops)
