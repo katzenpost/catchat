@@ -48,6 +48,10 @@ See the [install instructions](http://golang.org/doc/install.html).
 
     apt install --no-install-recommends build-essential libgles2 libgles2-mesa-dev libglib2.0-dev libxkbcommon-dev libxkbcommon-x11-dev libglu1-mesa-dev libxcursor-dev libwayland-dev libx11-xcb-dev libvulkan-dev
 
+#### Download and verify dependencies
+
+   go mod download && go mod verify
+
 #### Build catchat
 
     go build
@@ -60,6 +64,18 @@ See the [install instructions](http://golang.org/doc/install.html).
 #### Building for arm64
 
     CC=aarch64-linux-gnu-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build
+
+#### Building for Windows
+
+    GOOS=windows go build -ldflags="-H windowsgui"
+
+#### Building for macOS (Intel), requires macOS and xcode
+
+    GOARCH="amd64" go build
+
+#### Building for macOS (Apple M1, arm), requires macOS 11 and xcode
+
+    CGO_ENABLED=1 GOOS="darwin" GOARCH="arm64" go build -tags dynamic
 
 #### Building for android
 
