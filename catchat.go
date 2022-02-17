@@ -14,6 +14,7 @@ import (
 
 	"gioui.org/app"
 	_ "gioui.org/app/permission/storage"
+	"gioui.org/app/permission/foreground"
 	"gioui.org/font/gofont"
 	"gioui.org/io/key"
 	"gioui.org/io/system"
@@ -55,6 +56,7 @@ var (
 )
 
 type App struct {
+	fg    chan struct{}
 	w     *app.Window
 	ops   *op.Ops
 	c     *catshadow.Client
@@ -375,6 +377,11 @@ func (a *App) handleGioEvents(e interface{}) error {
 			if a.stack.Len() == 0 {
 				a.stack.Push(newSignInPage(a))
 			}
+		}
+		if e.Stage == system.StagePaused {
+			foreground.Start("Is running in the background", "")
+		} else {
+			foreground.Stop()
 		}
 	}
 	return nil
