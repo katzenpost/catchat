@@ -1,5 +1,5 @@
 docker-build-linux: docker-go-mod
-	docker run --rm -v "$(shell readlink -f .)":/go/catchat/ -it catchat/go_mod bash -c 'cd /go/catchat/; go build'
+	docker run --rm -v "$(shell readlink -f .)":/go/catchat/ -it catchat/go_mod bash -c 'cd /go/catchat/; go build -trimpath -ldflags=-buildid='
 
 docker-debian-base:
 	if ! docker images|grep catchat/debian_base; then \
