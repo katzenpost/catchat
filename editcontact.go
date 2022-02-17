@@ -2,8 +2,8 @@ package main
 
 import (
 	"gioui.org/gesture"
-	"gioui.org/io/pointer"
 	"gioui.org/layout"
+	"gioui.org/op/clip"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -129,7 +129,7 @@ func newEditContactPage(a *App, contact string) *EditContactPage {
 			dims := layout.Center.Layout(gtx, func(gtx C) D {
 				return layoutAvatar(gtx, p.a.c, p.nickname)
 			})
-			a := pointer.Rect(image.Rectangle{Max: dims.Size})
+			a := clip.Rect(image.Rectangle{Max: dims.Size})
 			t := a.Push(gtx.Ops)
 			p.avatar.Add(gtx.Ops)
 			t.Pop()

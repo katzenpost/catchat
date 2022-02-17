@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/base64"
 	"gioui.org/gesture"
-	"gioui.org/io/pointer"
 	"gioui.org/layout"
+	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	"gioui.org/text"
 	"gioui.org/unit"
@@ -128,7 +128,7 @@ func (p *HomePage) Layout(gtx layout.Context) layout.Dimensions {
 								)
 							}),
 						)
-						a := pointer.Rect(image.Rectangle{Max: dims.Size})
+						a := clip.Rect(image.Rectangle{Max: dims.Size})
 						t := a.Push(gtx.Ops)
 						p.contactClicks[contacts[i].Nickname].Add(gtx.Ops)
 						t.Pop()
