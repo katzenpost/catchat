@@ -54,7 +54,7 @@ See the [install instructions](http://golang.org/doc/install.html).
 
 #### Build catchat
 
-    go build
+    go build -trimpath -ldflags=-buildid=
 
 # Cross-compilation dependencies for the arm64 architecture
 
@@ -63,19 +63,19 @@ See the [install instructions](http://golang.org/doc/install.html).
 
 #### Building for arm64
 
-    CC=aarch64-linux-gnu-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build
+    CC=aarch64-linux-gnu-gcc CGO_ENABLED=1 GOOS=linux GOARCH=arm64 go build -trimpath -ldflags=-buildid=
 
 #### Building for Windows
 
-    GOOS=windows go build -ldflags="-H windowsgui"
+    GOOS=windows go build -trimpath -ldflags="-H windowsgui -buildid="
 
 #### Building for macOS (Intel), requires macOS and xcode
 
-    GOARCH="amd64" go build
+    GOARCH="amd64" go build -trimpath -ldflags=-buildid=
 
 #### Building for macOS (Apple M1, arm), requires macOS 11 and xcode
 
-    CGO_ENABLED=1 GOOS="darwin" GOARCH="arm64" go build -tags dynamic
+    CGO_ENABLED=1 GOOS="darwin" GOARCH="arm64" go build -tags dynamic -trimpath -ldflags=-buildid=
 
 #### Building for android
 
