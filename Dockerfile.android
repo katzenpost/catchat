@@ -5,10 +5,10 @@ LABEL authors="Masala: masala@riseup.net"
 # Install build requirements and JDK
 RUN apt update \
 && apt install --no-install-recommends -y git make ca-certificates \
-openjdk-11-jdk build-essential libgles2 libgles2-mesa-dev libglib2.0-dev \
-libxkbcommon-dev libxkbcommon-x11-dev libglu1-mesa-dev libxcursor-dev \
-libwayland-dev libx11-xcb-dev libvulkan-dev unzip \
-&& update-ca-certificates
+openjdk-11-jdk openjdk-11-jre-headless build-essential libgles2 \
+libgles2-mesa-dev libglib2.0-dev libxkbcommon-dev libxkbcommon-x11-dev \
+libglu1-mesa-dev libxcursor-dev libwayland-dev libx11-xcb-dev libvulkan-dev \
+unzip && update-ca-certificates
 
 ENV ANDROID_SDK_ROOT /opt/android-sdk
 ENV ANDROID_HOME ${ANDROID_SDK_ROOT}
