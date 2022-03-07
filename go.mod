@@ -2,8 +2,10 @@ module github.com/katzenpost/catchat
 
 go 1.16
 
+replace gioui.org => github.com/mixmasala/gio v0.0.0-20220307132411-748a013b0be6
+
 require (
-	gioui.org v0.0.0-20211116174122-a699f771c6e6
+	gioui.org v0.0.0-20220307121938-3e18a310af31
 	gioui.org/x/notify v0.0.0-20211102210401-cead9283b8ff
 	github.com/benc-uk/gofract v0.0.0-20200624074122-f2d59d20813c
 	github.com/hako/durafmt v0.0.0-20210316092057-3a2c319c1acd
