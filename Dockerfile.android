@@ -20,7 +20,7 @@ ENV TOOLS_ZIP commandlinetools-linux-6858069_latest.zip
 ENV TOOLS_SHA256SUM 87f6dcf41d4e642e37ba03cb2e387a542aa0bd73cb689a9e7152aad40a6e7a08
 ENV JAVA_BIN /usr/lib/jvm/java-11-openjdk-amd64/bin
 ENV PATH $JAVA_BIN:${PATH}
-ENV ANDROID_ABI android-30
+ENV ANDROID_ABI android-31
 
 # Android command-line tools
 RUN mkdir -p ${ANDROID_SDK_ROOT}/cmdline-tools \
