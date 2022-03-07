@@ -2,7 +2,7 @@ module github.com/katzenpost/catchat
 
 go 1.17
 
-replace gioui.org => github.com/mixmasala/gio v0.0.0-20220307155214-64beb4762975
+replace gioui.org => github.com/mixmasala/gio v0.0.0-20220307160723-d54f4ba3dbc1
 
 require (
 	gioui.org v0.0.0-20220307121938-3e18a310af31
