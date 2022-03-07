@@ -11,7 +11,7 @@ A chat client using catshadow.
 
     git clone https://github.com/katzenpost/catchat
     cd catchat
-    git checkout wip_gioui_interface
+    git checkout devel
 
 ## Building catchat for GNU/Linux
 
