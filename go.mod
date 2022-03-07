@@ -11,12 +11,12 @@ require (
 	github.com/hako/durafmt v0.0.0-20210608085754-5c1018a4e16b
 	github.com/katzenpost/katzenpost v0.0.11
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
-	golang.org/x/exp/shiny v0.0.0-20220307080910-a2e15db56b5f
+	golang.org/x/exp/shiny v0.0.0-20220307200941-a1099baf94bf
 	golang.org/x/image v0.0.0-20220302094943-723b81ca9867
 )
 
 require (
-	gioui.org/cpu v0.0.0-20210817075930-8d6a761490d2 // indirect
+	gioui.org/cpu v0.0.0-20220307141130-bd82e69a82aa // indirect
 	gioui.org/shader v1.0.6 // indirect
 	git.wow.st/gmp/jni v0.0.0-20210610011705-34026c7e22d0 // indirect
 	github.com/BurntSushi/toml v1.0.0 // indirect
@@ -42,7 +42,7 @@ require (
 	gitlab.com/yawning/bsaes.git v0.0.0-20190805113838-0a714cd429ec // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
-	golang.org/x/sys v0.0.0-20220227234510-4e6760a101f9 // indirect
+	golang.org/x/sys v0.0.0-20220307203707-22a9840ba4d7 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/eapache/channels.v1 v1.1.0 // indirect

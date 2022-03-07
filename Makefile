@@ -11,14 +11,14 @@ docker-debian-base:
 docker-go-mod: docker-debian-base
 	if ! docker images|grep catchat/go_mod; then \
 		docker run -v "$(shell readlink -f .)":/go/catchat --name catchat_go_mod -it catchat/debian_base \
-			bash -c 'cd /go/catchat; go mod tidy' \
+			bash -c 'cd /go/catchat; go mod tidy -compat=1.17' \
 		&& docker commit catchat_go_mod catchat/go_mod \
 		&& docker rm catchat_go_mod; \
 	fi
 
 docker-go-mod-update: docker-go-mod
 	docker run -v "$(shell readlink -f .)":/go/catchat --name catchat_go_mod -it catchat/go_mod \
-			bash -c 'cd /go/catchat; go mod tidy' \
+			bash -c 'cd /go/catchat; go mod tidy -compat=1.17' \
 		&& docker commit catchat_go_mod catchat/go_mod \
 		&& docker rm catchat_go_mod
 
