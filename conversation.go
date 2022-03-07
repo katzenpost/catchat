@@ -4,16 +4,16 @@ import (
 	"github.com/hako/durafmt"
 	"github.com/katzenpost/katzenpost/catshadow"
 	"golang.org/x/exp/shiny/materialdesign/icons"
+	"image"
 	"runtime"
 	"strings"
 	"time"
 
+	"gioui.org/gesture"
 	"gioui.org/io/clipboard"
 	"gioui.org/io/pointer"
-	"image"
-
-	"gioui.org/gesture"
 	"gioui.org/layout"
+	"gioui.org/op/clip"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -196,7 +196,7 @@ func (c *conversationPage) Layout(gtx layout.Context) layout.Dimensions {
 					layout.Rigid(button(th, c.back, backIcon).Layout),
 					layout.Rigid(func(gtx C) D {
 						dims := layoutAvatar(gtx, c.a.c, c.nickname)
-						a := pointer.Rect(image.Rectangle{Max: dims.Size})
+						a := clip.Rect(image.Rectangle{Max: dims.Size})
 						t := a.Push(gtx.Ops)
 						c.edit.Add(gtx.Ops)
 						t.Pop()
@@ -260,7 +260,7 @@ func (c *conversationPage) Layout(gtx layout.Context) layout.Dimensions {
 							layout.Flexed(1, fill{th.Bg}.Layout),
 						)
 					}
-					a := pointer.Rect(image.Rectangle{Max: dims.Size})
+					a := clip.Rect(image.Rectangle{Max: dims.Size})
 					t := a.Push(gtx.Ops)
 					c.messageClicks[messages[i]].Add(gtx.Ops)
 					t.Pop()
@@ -268,7 +268,7 @@ func (c *conversationPage) Layout(gtx layout.Context) layout.Dimensions {
 
 				})
 				if c.messageClicked != nil {
-					a := pointer.Rect(image.Rectangle{Max: dims.Size})
+					a := clip.Rect(image.Rectangle{Max: dims.Size})
 					t := a.Push(gtx.Ops)
 					c.cancel.Add(gtx.Ops)
 					t.Pop()
@@ -311,7 +311,7 @@ func (c *conversationPage) Layout(gtx layout.Context) layout.Dimensions {
 						dims := bgSender.Layout(gtx, material.Editor(th, c.compose, "").Layout)
 						t := pointer.PassOp{}.Push(gtx.Ops)
 						defer t.Pop()
-						a := pointer.Rect(image.Rectangle{Max: dims.Size})
+						a := clip.Rect(image.Rectangle{Max: dims.Size})
 						x := a.Push(gtx.Ops)
 						defer x.Pop()
 						c.msgpaste.Add(gtx.Ops)

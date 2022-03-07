@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"gioui.org/gesture"
 	"gioui.org/io/clipboard"
-	"gioui.org/io/pointer"
 	"gioui.org/layout"
+	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -157,7 +157,7 @@ func (p *AddContactPage) Layout(gtx layout.Context) layout.Dimensions {
 					}),
 					layout.Flexed(1, func(gtx C) D {
 						dims := p.contactal.Layout(gtx)
-						a := pointer.Rect(image.Rectangle{Max: dims.Size})
+						a := clip.Rect(image.Rectangle{Max: dims.Size})
 						t := a.Push(gtx.Ops)
 						p.newAvatar.Add(gtx.Ops)
 						t.Pop()
@@ -330,7 +330,7 @@ func (p *AddContactPage) layoutQr(gtx C) D {
 		return widget.Image{Fit: widget.ScaleDown, Src: paint.NewImageOp(i)}.Layout(gtx)
 
 	})
-	a := pointer.Rect(image.Rectangle{Max: dims.Size})
+	a := clip.Rect(image.Rectangle{Max: dims.Size})
 	t := a.Push(gtx.Ops)
 	p.newQr.Add(gtx.Ops)
 	t.Pop()

@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"gioui.org/app"
 	"gioui.org/gesture"
-	"gioui.org/io/pointer"
 	"gioui.org/layout"
+	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	"gioui.org/unit"
 	"gioui.org/widget"
@@ -59,7 +59,7 @@ func (p *AvatarPicker) Layout(gtx layout.Context) layout.Dimensions {
 				dims := layout.Center.Layout(gtx, func(gtx C) D {
 					return layoutAvatar(gtx, p.a.c, p.nickname)
 				})
-				a := pointer.Rect(image.Rectangle{Max: dims.Size})
+				a := clip.Rect(image.Rectangle{Max: dims.Size})
 				t := a.Push(gtx.Ops)
 				p.avatar.Add(gtx.Ops)
 				t.Pop()
@@ -106,7 +106,7 @@ func (p *AvatarPicker) Layout(gtx layout.Context) layout.Dimensions {
 						dims := in.Layout(gtx, func(gtx C) D {
 							return material.Body1(th, fn.Name()).Layout(gtx)
 						})
-						a := pointer.Rect(image.Rectangle{Max: dims.Size})
+						a := clip.Rect(image.Rectangle{Max: dims.Size})
 						t := a.Push(gtx.Ops)
 						p.clicks[fn.Name()].Add(gtx.Ops)
 						t.Pop()
@@ -123,7 +123,7 @@ func (p *AvatarPicker) Layout(gtx layout.Context) layout.Dimensions {
 										scale := float32(gtx.Constraints.Max.X) / float32(sz.X)
 										return widget.Image{Scale: scale, Src: paint.NewImageOp(m)}.Layout(gtx)
 									})
-									a := pointer.Rect(image.Rectangle{Max: dims.Size})
+									a := clip.Rect(image.Rectangle{Max: dims.Size})
 									t := a.Push(gtx.Ops)
 									if _, ok := p.clicks[fn.Name()]; !ok {
 										c := new(gesture.Click)

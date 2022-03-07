@@ -51,7 +51,7 @@ func (p *SettingsPage) Layout(gtx layout.Context) layout.Dimensions {
 						return inset.Layout(gtx, material.Body1(th, "Use Tor").Layout)
 					}),
 					layout.Flexed(settingDetailsColumnWidth, func(gtx C) D {
-						return inset.Layout(gtx, material.Switch(th, p.switchUseTor).Layout)
+						return inset.Layout(gtx, material.Switch(th, p.switchUseTor, "Use Tor").Layout)
 					}),
 				)
 			}),
@@ -61,7 +61,7 @@ func (p *SettingsPage) Layout(gtx layout.Context) layout.Dimensions {
 						return inset.Layout(gtx, material.Body1(th, "Connect Automatically").Layout)
 					}),
 					layout.Flexed(settingDetailsColumnWidth, func(gtx C) D {
-						return inset.Layout(gtx, material.Switch(th, p.switchAutoConnect).Layout)
+						return inset.Layout(gtx, material.Switch(th, p.switchAutoConnect, "Connect Automatically").Layout)
 					}),
 				)
 			}),
