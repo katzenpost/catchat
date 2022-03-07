@@ -121,6 +121,10 @@ Between versions you might need to install uninstall a previous build
 
     adb uninstall org.mixnetworks.catchat
 
+#### Verify build: To verify that your local build matches the CI-built apk, use the included reproducible.keystore to sign the apk:
+
+    docker run --rm -v "$(pwd)":/go/build/ katzenpost/android_build gogio -arch arm64,amd64 -x -target android -appid org.mixnetworks.catchat -version 1 -signkey reproducible.keystore -signpass reproducible .
+
 ## Run it
 
     Usage of ./deploy/linux/catchat:
@@ -129,6 +133,4 @@ Between versions you might need to install uninstall a previous build
       -s string
          The catshadow state file path. (default "catshadow_statefile")
 
-## Verify build: To verify that your local build matches the CI-built apk, use the included reproducible.keystore to sign the apk:
 
-   docker run --rm -v "$(pwd)":/go/build/ katzenpost/android_build gogio -arch arm64,amd64 -x -target android -appid org.mixnetworks.catchat -version 1 -signkey reproducible.keystore -signpass reproducible .
