@@ -86,7 +86,7 @@ See the Dockerfile.android in this repository to set up a build environment if y
 
 First, get and install the gogio tool:
 
-    go get -v gioui.org/cmd/gogio@4b377aa896373062db0f9d289d0111a29e8fa4b0
+    go get -v gioui.org/cmd/gogio
 
 Generate an Android signing key so you can update your app later:
 (keytool is provided by the openjdk package: apt install openjdk-11-jdk, or use within the docker container)
@@ -109,7 +109,7 @@ changes to test on android. Do not forget to update or remove the vendor path.
 
 To run the build, execute the following command while in this project root:
 
-    docker run -v "$(pwd)":/go/build/ katzenpost/android_build gogio -arch arm64,amd64 -x -target android -appid org.mixnetworks.catchat -version 1 -signkey sign.keystore -signpass YOURPASSWORD .
+    docker run -v "$(pwd)":/go/build/ katzenpost/android_build bash -c "go get -v gioui.org/cmd/gogio && gogio -arch arm64,amd64 -x -target android -appid org.mixnetworks.catchat -version 1 -signkey sign.keystore -signpass YOURPASSWORD ."
 
 Note that the contents of the local directory are copied into the docker environment - so your signing keystore ought to be in this path as well.
 
@@ -123,7 +123,7 @@ Between versions you might need to install uninstall a previous build
 
 #### Verify build: To verify that your local build matches the CI-built apk, use the included reproducible.keystore to sign the apk:
 
-    docker run --rm -v "$(pwd)":/go/build/ katzenpost/android_build gogio -arch arm64,amd64 -x -target android -appid org.mixnetworks.catchat -version 1 -signkey reproducible.keystore -signpass reproducible .
+    docker run --rm -v "$(pwd)":/go/build/ katzenpost/android_build bash -c "go get -v gioui.org/cmd/gogio && gogio -arch arm64,amd64 -x -target android -appid org.mixnetworks.catchat -version 1 -signkey reproducible.keystore -signpass reproducible ."
 
 ## Run it
 

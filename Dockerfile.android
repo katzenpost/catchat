@@ -51,9 +51,5 @@ RUN yes | sdkmanager --licenses \
 #&& yes | sdkmanager "ndk-bundle" \
 && yes | sdkmanager "platforms;${ANDROID_ABI}"
 
-# install gogio
-# XXX: verify that this command uses pinned version in go.mod
-RUN go get -v gioui.org/cmd/gogio
-
 # Set the working directory for the container
 WORKDIR /go/build
