@@ -4,10 +4,6 @@ docker-build-linux: docker-go-mod
 docker-build-windows: docker-go-mod
 	docker run --rm -v "$(shell readlink -f .)":/go/catchat/ catchat/go_mod bash -c 'cd /go/catchat/; GOOS=windows go build -trimpath -ldflags="-H windowsgui -buildid=" -o catchat.exe'
 
-docker-build-macos: docker-go-mod
-	docker run --rm -v "$(shell readlink -f .)":/go/catchat/ catchat/go_mod bash -c 'cd /go/catchat/; GOARCH="amd64" go build -trimpath -ldflags=-buildid= -o catchat-macos-amd64'
-	docker run --rm -v "$(shell readlink -f .)":/go/catchat/ catchat/go_mod bash -c 'cd /go/catchat/; CGO_ENABLED=1 GOOS="darwin" GOARCH="arm64" go build -trimpath -ldflags=-buildid= -tags dynamic -o catchat-macos-arm64'
-
 docker-debian-base:
 	if ! docker images|grep catchat/debian_base; then \
 		docker run --name catchat_debian_base golang:buster bash -c 'apt update && apt upgrade -y && apt install -y --no-install-recommends build-essential libgles2 libgles2-mesa-dev libglib2.0-dev libxkbcommon-dev libxkbcommon-x11-dev libglu1-mesa-dev libxcursor-dev libwayland-dev libx11-xcb-dev libvulkan-dev' \

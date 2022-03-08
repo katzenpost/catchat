@@ -68,8 +68,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build for MacOS
-        run: sudo make docker-build-macos
+      - name: Build for MacOS (amd64)
+        run: GOARCH="amd64" go build -trimpath -ldflags=-buildid= -o catchat-macos-amd64
+
+      - name: Build for MacOS (arm64)
+        run: CGO_ENABLED=1 GOOS="darwin" GOARCH="arm64" go build -trimpath -ldflags=-buildid= -tags dynamic -o catchat-macos-arm64
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v2
