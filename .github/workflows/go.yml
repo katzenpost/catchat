@@ -102,7 +102,7 @@ jobs:
 
       - name: Build catchat apk
         run: |
-          docker run -v "$(pwd)":/go/build/ katzenpost/android_build bash -c "go get -v gioui.org/cmd/gogio && gogio -arch arm64,amd64 -x -target android -appid org.mixnetworks.catchat -version 1 -signkey reproducible.keystore -signpass reproducible ."
+          docker run -v "$(pwd)":/go/build/ katzenpost/android_build bash -c "go install gioui.org/cmd/gogio && gogio -arch arm64,amd64 -x -target android -appid org.mixnetworks.catchat -version 1 -signkey reproducible.keystore -signpass reproducible ."
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v2

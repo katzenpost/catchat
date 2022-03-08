@@ -18,10 +18,12 @@ require (
 )
 
 require (
+	gioui.org/cmd v0.0.0-20220307121938-3e18a310af31 // indirect
 	gioui.org/cpu v0.0.0-20220307141130-bd82e69a82aa // indirect
 	gioui.org/shader v1.0.6 // indirect
 	git.wow.st/gmp/jni v0.0.0-20210610011705-34026c7e22d0 // indirect
 	github.com/BurntSushi/toml v1.0.0 // indirect
+	github.com/akavel/rsrc v0.10.1 // indirect
 	github.com/awnumar/memcall v0.1.2 // indirect
 	github.com/awnumar/memguard v0.22.2 // indirect
 	github.com/cloudflare/circl v1.1.0 // indirect
@@ -43,9 +45,13 @@ require (
 	gitlab.com/yawning/aez.git v0.0.0-20211027044916-e49e68abd344 // indirect
 	gitlab.com/yawning/bsaes.git v0.0.0-20190805113838-0a714cd429ec // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
+	golang.org/x/mod v0.4.2 // indirect
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f // indirect
+	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a // indirect
 	golang.org/x/sys v0.0.0-20220307203707-22a9840ba4d7 // indirect
 	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/tools v0.1.0 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/eapache/channels.v1 v1.1.0 // indirect
 	gopkg.in/op/go-logging.v1 v1.0.0-20160211212156-b2cb9fa56473 // indirect
