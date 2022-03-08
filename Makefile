@@ -1,5 +1,12 @@
 docker-build-linux: docker-go-mod
-	docker run --rm -v "$(shell readlink -f .)":/go/catchat/ -it catchat/go_mod bash -c 'cd /go/catchat/; go build -trimpath -ldflags=-buildid='
+	docker run --rm -v "$(shell readlink -f .)":/go/catchat/ catchat/go_mod bash -c 'cd /go/catchat/; go build -trimpath -ldflags=-buildid='
+
+docker-build-windows: docker-go-mod
+	docker run --rm -v "$(shell readlink -f .)":/go/catchat/ catchat/go_mod bash -c 'cd /go/catchat/; GOOS=windows go build -trimpath -ldflags="-H windowsgui -buildid=" -o catchat.exe'
+
+docker-build-macos: docker-go-mod
+	docker run --rm -v "$(shell readlink -f .)":/go/catchat/ catchat/go_mod bash -c 'cd /go/catchat/; GOARCH="amd64" go build -trimpath -ldflags=-buildid= -o catchat-macos-amd64'
+	docker run --rm -v "$(shell readlink -f .)":/go/catchat/ catchat/go_mod bash -c 'cd /go/catchat/; CGO_ENABLED=1 GOOS="darwin" GOARCH="arm64" go build -trimpath -ldflags=-buildid= -tags dynamic -o catchat-macos-arm64'
 
 docker-debian-base:
 	if ! docker images|grep catchat/debian_base; then \
