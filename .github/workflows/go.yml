@@ -96,13 +96,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build android_build docker image
+      - name: Build sdk docker image
         run: |
-          docker build --no-cache -t katzenpost/android_build -f Dockerfile.android .
+          docker volume create sdk && docker volume create ndk && docker build --no-cache -t sdk -f Dockerfile.android .
+
+      - name: Extract sdk and ndk components into docker volumes
+        run: |
+          docker run --rm -v sdk:/sdk -v ndk:/ndk sdk bash -c 'cp -ar /opt/android-sdk/* /sdk && cp -ar /opt/android-ndk/* /ndk'
+
+      - name: Build catchat from Fdroid Metadata
+        run: |
+          git clone https://github.com/katzenpost/fdroiddata && cd fdroiddata &&  git checkout add_catchat && \
+          docker run --rm -v sdk:/opt/android-sdk -v ndk:/opt/android-ndk -v $(pwd):/repo -e ANDROID_HOME:/opt/android-sdk registry.gitlab.com/fdroid/docker-executable-fdroidserver:master build org.mixnetworks.catchat:1 -v
 
       - name: Build catchat apk
         run: |
-          docker run -v "$(pwd)":/go/build/ katzenpost/android_build bash -c "go install gioui.org/cmd/gogio && gogio -arch arm64,amd64 -x -target android -appid org.mixnetworks.catchat -version 1 -signkey reproducible.keystore -signpass reproducible ."
+          docker run -v "$(pwd)":/go/build/ sdk bash -c "go install gioui.org/cmd/gogio && gogio -arch arm64,amd64 -x -target android -appid org.mixnetworks.catchat -version 1 -signkey reproducible.keystore -signpass reproducible ."
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v2
