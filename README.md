@@ -5,7 +5,13 @@ catchat
 [![Go ReportCard](http://goreportcard.com/badge/katzenpost/catchat)](http://goreportcard.com/report/katzenpost/catchat)
 [![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://pkg.go.dev/github.com/katzenpost/catchat?tab=doc)
 
-A chat client using catshadow.
+A chat client using catshadow, built using Qt5 and QML.
+
+## Status
+
+This code stopped being updated in 2021 and was replaced by a new gioui-based client which is now called **Katzen**: https://github.com/katzenpost/katzen
+
+If someone is so inclined they could try to update this Qt codebase to work with the latest katzenpost/catshadow changes, but until then we're archiving this repo.
 
 ## Installation
 
